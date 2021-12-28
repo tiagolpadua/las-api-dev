@@ -21,6 +21,7 @@ function capitalizar(palavra) {
 // o valor default do comprimento máximo deve ser 5:
 // (teste, 10) -> teste
 // (fulano, 4) -> fula...
+
 // function truncar() { }
 function truncar(palavra, comprimento = 5) {
     if (palavra.length > comprimento) {
