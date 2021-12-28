@@ -29,12 +29,20 @@ function truncar(palavra, comprimento = 5) {
 // "" -> undefined
 // "   " -> undefined
 // "      Maria " -> "Maria"
-function validaTextoPreenchido() { }
+function validaTextoPreenchido(texto) {
+   const textoSemEspacos = texto.trim();
+   if (textoSemEspacos) {
+       return textoSemEspacos;
+   }
+}
 
 
 // Escreva uma função que valida se a string passada é uma data de nascimento válida, deve retornar um objeto Date sea data for válida ou NaN caso seja inválida.
 // 01/01/2000 -> Ok
 // 99/99/9999 -> NaN
-function validaData() { }
+function validaData(texto) {
+    const [dia, mes, ano] = texto.split('/');
+   return Date.parse(`${ano}-${mes}-${dia}`); 
+}
 
 module.exports = { saudar, extrairPrimeiroNome, capitalizar, truncar, validaTextoPreenchido, validaData };
