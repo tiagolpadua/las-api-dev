@@ -24,7 +24,7 @@ function capitalizar(palavra) {
 // function truncar() { }
 function truncar(palavra, comprimento = 5) {
     if (palavra.length > comprimento) {
-        return palavra.slice(0, comprimento) + '...x';
+        return palavra.slice(0, comprimento) + '...';
     } else {
         return palavra;
     }
