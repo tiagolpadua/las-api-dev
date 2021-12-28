@@ -30,4 +30,32 @@ function truncar(palavra, comprimento = 5) {
     }
 }
 
-module.exports = { saudar, extrairPrimeiroNome, capitalizar, truncar };
+// Escreva uma função que valida se o texto informado está preenchido e retorna o texto sem espaços antes ou depois.
+// "" -> undefined
+// "   " -> undefined
+// "      Maria " -> "Maria"
+// function validaTextoPreenchido() { }
+
+function validaTextoPreenchido(texto) {
+    return (texto && texto.trim()) || undefined;
+}
+
+// Escreva uma função que valida se a string passada é uma data de nascimento válida, deve retornar um objeto Date sea data for válida ou NaN caso seja inválida.
+// 01/01/2000 -> Ok
+// 99/99/9999 -> NaN
+// function validaData() { }
+
+function validaData(dataComoTexto) {
+    const partes = dataComoTexto.split('/');
+    if (partes.length !== 3) {
+        return NaN;
+    }
+
+    const dd = partes[0];
+    const mm = partes[1];
+    const aaaa = partes[2];
+
+    return Date.parse(`${mm}/${dd}/${aaaa}`)
+}
+
+module.exports = { saudar, extrairPrimeiroNome, capitalizar, truncar, validaTextoPreenchido, validaData };
