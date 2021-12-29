@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "test:essencial": "jest -t Essencial",
+    "test:desafio": "jest -t Desafio",
     "test:watch": "jest --watch"
   },
   "repository": {
