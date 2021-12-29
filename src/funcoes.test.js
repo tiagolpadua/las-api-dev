@@ -1,4 +1,4 @@
-const { saudar, extrairPrimeiroNome, capitalizar, truncar, validaData, validaTextoPreenchido } = require('./funcoes');
+const { saudar, extrairPrimeiroNome, capitalizar, truncar, validaData, validaTextoPreenchido, calculaImposto, calculaDesconto } = require('./funcoes');
 
 describe('Essencial', () => {
     test('Deve saudar um usuário.', () => {
@@ -13,6 +13,26 @@ describe('Essencial', () => {
         expect(capitalizar("mArIa")).toBe("Maria");
     });
 
+    test('Deve calcular o imposto de um preço e categoria fornecidos.', () => {
+        expect(calculaImposto(30, "Alimentação")).toBe(0);
+        expect(calculaImposto(10, "Bebida")).toBe(1);
+    });
+
+    test('Deve calcular o desconto de um preço, categoria e cupom fornecidos.', () => {
+        expect(calculaDesconto(30, "Alimentação", "NULABSSA")).toBe(15);
+        expect(calculaDesconto(10, "Bebida", "NULABSSA")).toBe(10);
+        expect(calculaDesconto(30, "Alimentação", "XPTO")).toBe(30);
+        expect(calculaDesconto(10, "Bebida", "XPTO")).toBe(10);
+    });
+});
+
+describe('Desejável', () => {
+    test('Deve validar se o texto está preenchido.', () => {
+        expect(validaTextoPreenchido("")).toBeUndefined();
+        expect(validaTextoPreenchido("    ")).toBeUndefined();
+        expect(validaTextoPreenchido("    Maria ")).toBe("Maria");
+    });
+
     test('Deve truncar uma palavra maior que o comprimento máximo.', () => {
         expect(truncar("Fulano", 4)).toBe("Fula...");
     });
@@ -24,14 +44,6 @@ describe('Essencial', () => {
     test('Não deve truncar palavras menores que o comprimento máximo.', () => {
         expect(truncar("Fulano", 20)).toBe("Fulano");
     });
-
-
-    test('Deve validar se o texto está preenchido.', () => {
-        expect(validaTextoPreenchido("")).toBeUndefined();
-        expect(validaTextoPreenchido("    ")).toBeUndefined();
-        expect(validaTextoPreenchido("    Maria ")).toBe("Maria");
-    });
-
 });
 
 describe('Desafio', () => {
