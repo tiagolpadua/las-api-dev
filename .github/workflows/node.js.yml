@@ -27,7 +27,7 @@ jobs:
         cache: 'npm'
     - run: npm ci
 #     - run: npm run build --if-present
-    - run: npm test:essencial
+    - run: npm run test:essencial
 
   test-desafio:
     runs-on: ubuntu-latest
@@ -46,4 +46,4 @@ jobs:
         cache: 'npm'
     - run: npm ci
 #     - run: npm run build --if-present
-    - run: npm test:desafio
+    - run: npm run test:desafio
