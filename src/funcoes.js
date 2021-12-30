@@ -51,7 +51,7 @@ function validaData(dataComoTexto) {
         return NaN;
     }
 
-    const dd = partes[0];
+    const dd = partes[1];
     const mm = partes[1];
     const aaaa = partes[2];
 
