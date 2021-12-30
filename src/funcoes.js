@@ -69,7 +69,7 @@ function truncar(palavra, comprimento = 5) {
 // function validaTextoPreenchido() { }
 
 function validaTextoPreenchido(texto) {
-    return null;
+    return (texto && texto.trim()) || undefined;
 }
 
 // =======
@@ -87,11 +87,11 @@ function validaData(dataComoTexto) {
         return NaN;
     }
 
-    const dd = partes[1];
+    const dd = partes[0];
     const mm = partes[1];
     const aaaa = partes[2];
 
     return Date.parse(`${mm}/${dd}/${aaaa}`)
 }
 
-module.exports = { saudar, extrairPrimeiroNome, capitalizar, truncar, validaTextoPreenchido, validaData, calculaImposto, calculaDesconto };
+module.exports = { saudar, extrairPrimeiroNome, capitalizar, calculaImposto, calculaDesconto, truncar, validaTextoPreenchido, validaData };

@@ -1,4 +1,4 @@
-const { saudar, extrairPrimeiroNome, capitalizar, truncar, validaData, validaTextoPreenchido, calculaImposto, calculaDesconto } = require('./funcoes');
+const { saudar, extrairPrimeiroNome, capitalizar, calculaImposto, calculaDesconto, truncar, validaTextoPreenchido, validaData } = require('./funcoes');
 
 describe('Essencial', () => {
     test('Deve saudar um usuário.', () => {
