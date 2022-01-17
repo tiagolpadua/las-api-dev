@@ -48,9 +48,9 @@ describe('Desejável', () => {
 
 describe('Desafio', () => {
     test('Deve validar uma data correta.', () => {
-        expect(validaData("01/03/2000")).toBeTruthy();
-        expect(validaData("01/12/2000")).toBeTruthy();
-        expect(validaData("30/12/2000")).toBeTruthy();
+        expect(validaData("01/03/2000") instanceof Date).toBeTruthy();
+        expect(validaData("01/12/2000") instanceof Date).toBeTruthy();
+        expect(validaData("30/12/2000") instanceof Date).toBeTruthy();
     });
 
     test('Deve recusar datas inválidas.', () => {
