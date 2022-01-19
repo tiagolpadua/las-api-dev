@@ -91,4 +91,5 @@ function validaData(dataComoTexto) {
         return NaN;
     }
 }
+
 module.exports = { saudar, extrairPrimeiroNome, capitalizar, calculaImposto, calculaDesconto, truncar, validaTextoPreenchido, validaData };
