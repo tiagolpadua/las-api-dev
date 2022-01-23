@@ -132,11 +132,14 @@ function obterPrecosDentroDoOrcamento(lista, menorValor, maiorValor) {
 // ('Bebida', 'CUPOM-INVALIDO') => 0
 // ('Alimentação', 'CUPOM-INVALIDO') => 30
 // Utilize a função descontoCategoria criada anteriormente
-function obterDescontoTotal(categoria, cupom) {
+function cupomEhValido(cupom) {
     const cuponsValidos = ['NULABSSA', 'ALURANU'];
+    return cuponsValidos.indexOf(cupom) !== -1;
+}
 
+function obterDescontoTotal(categoria, cupom) {
     const descontoCategoria = obterDescontoCategoria(categoria);
-    if (cuponsValidos.indexOf(cupom) !== -1) {
+    if (cupomEhValido(cupom)) {
         return descontoCategoria + 10;
     } else {
         return descontoCategoria;
@@ -174,12 +177,12 @@ function capitalizarNomeCompleto(nomeCompleto) {
 
 // Crie uma função que recebe uma lista de preços e categorias e devolve um cupom fiscal conforme abaixo:
 // (['Serpentina', 'Refrigerante'], [20, 7], ['Infantil', 'Bebida'], 'NULABSSA') => 
-// "Nome            Valor     Desconto  Imposto   Total"
-// "Serpentina      R$ 20,00  R$  3,00            R$ 17,00"
-// "Refrigerante    R$  7,00                15%   R$  8,05"
-// "Subtotal                                      R$ 25,05"
-// "Cupom de Desconto: NULABSSA                   R$  2,51"
-// "Total                                         R$ 27,56"
+// Nome           Valor     Desconto  Imposto Total     
+// Serpentina     R$  20,00 R$   5,00     15% R$  18,00 
+// Refrigerante   R$   7,00 R$   0,70         R$   6,30 
+// Subtotal                                   R$  24,30 
+// Cupom de Desconto: NULABSSA                R$   3,00 
+// Total                                      R$  21,30
 
 function leftpad(p, n) {
     let ret = p;
@@ -221,11 +224,11 @@ function gerarCupomFiscal(listaNomesProdutos, listaPrecosProdutos, listaCategori
 
         let impostoCalculado = 0;
 
-        if (categoriasIsentas.indexOf(listaCategoriasProdutos[idx]) !== -1) {
+        if (categoriasIsentas.indexOf(listaCategoriasProdutos[idx]) === -1) {
             impostoCalculado = listaPrecosProdutos[idx] * (imposto / 100);
         }
 
-        let descontoCalculado = listaPrecosProdutos[idx] * (obterDescontoTotal(listaCategoriasProdutos[idx], cupom) / 100);
+        let descontoCalculado = listaPrecosProdutos[idx] * (obterDescontoCategoria(listaCategoriasProdutos[idx]) / 100);
 
         let valor = listaPrecosProdutos[idx] - descontoCalculado + impostoCalculado;
 
@@ -238,10 +241,20 @@ function gerarCupomFiscal(listaNomesProdutos, listaPrecosProdutos, listaCategori
             formataValor(valor) + ' '
     }).join('\n');
 
-    let total = calcularTotalDaCompraComDescontos(listaPrecosProdutos, listaCategoriasProdutos, cupom);
+    let descontoCupom = cupomEhValido(cupom) ? subTotal * 0.1 : 0;
+
+    descontoCupom = Number.parseFloat(descontoCupom.toFixed(2));
+
+    let linhaDescontoCupom = '';
+
+    if (descontoCupom > 0) {
+        linhaDescontoCupom = `Cupom de Desconto: ${rightpad(cupom, 23)} ${formataValor(descontoCupom)} \n`;
+    }
+
+    const total = subTotal - descontoCupom;
 
     const rodape = 'Subtotal' + leftpad(formataValor(subTotal), 44) + ' \n' +
-        `Cupom de Desconto: ${rightpad(cupom, 23)} ${formataValor((total - subTotal) * -1)} \n` +
+        linhaDescontoCupom +
         `${rightpad('Total', 42)} ${formataValor(total)}`;
 
     return cabecalho + corpo + '\n' + rodape;
