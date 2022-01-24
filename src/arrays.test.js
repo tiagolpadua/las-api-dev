@@ -21,7 +21,7 @@ describe('Essencial', () => {
 
         expect(obterMenorPreco([10, 7, 8, 25, 8, 9, 100, 99])).toEqual(7);
 
-        expect(obterMenorPreco([10, 7, 8, 25, 8, 9, -1, 99])).toEqual(-1);
+        expect(obterMenorPreco([10, 7, 8, 25, 8, 9, 0.5, 99])).toEqual(0.5);
     });
 
     test('Deve obter o maior preço.', () => {
