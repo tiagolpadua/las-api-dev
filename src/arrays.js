@@ -259,6 +259,7 @@ function gerarCupomFiscal(listaNomesProdutos, listaPrecosProdutos, listaCategori
 }
 
 module.exports = {
+    listaEhInvalida,
     obterMenorPreco,
     obterMaiorPreco,
     capitalizarNomes,
