@@ -185,7 +185,6 @@ function capitalizarNomeCompleto(nomeCompleto) {
 // Total                                      R$  21,30
 
 function leftpad(p, n) {
-    let ret = p;
     while (p.length < n) {
         p = " " + p;
     }
@@ -193,7 +192,6 @@ function leftpad(p, n) {
 }
 
 function rightpad(p, n) {
-    let ret = p;
     while (p.length < n) {
         p = p + " ";
     }
