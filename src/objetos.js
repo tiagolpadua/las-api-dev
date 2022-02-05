@@ -26,6 +26,8 @@ const { listaEhInvalida } = require('./arrays');
 // }
 //---------------------------------------------------------------------------------------
 
+const CATEGORIAS = [{ nome: 'Alimentação', desconto: 30 }, { nome: 'Infantil', desconto: 15 }];
+
 // =========
 // Essencial
 // =========
@@ -45,7 +47,7 @@ function obterMenorPreco(produtos) {
     return menor;
 }
 
-// Crie uma função que recebe uma lista de preços e devolve o maior preço
+// Crie uma função que recebe uma lista de produtos e devolve o produto com o maior preço
 function obterMaiorPreco(produtos) {
     if (listaEhInvalida(produtos)) {
         return undefined;
@@ -60,8 +62,8 @@ function obterMaiorPreco(produtos) {
     return maior;
 }
 
-// Crie uma função que receba uma lista de produtos e devolve uma lista que inclui uma propriedade precoFormatado
-// com o valor formatado em Reais
+// Crie uma função que receba um produto e retorna uma cópia deste produto incluindo uma nova proprieade
+// chamada 'precoFormatado' com o valor formatado em Reais
 function formatarValor(valor) {
     return 'R$ ' + (Math.round(valor * 100) / 100).toFixed(2).split('.').join(',');
 }
@@ -74,10 +76,9 @@ function incluirPrecoFormatado(produto) {
 // ou 0 se não houver desconto.
 // Utilize as listas que já estão na função para implementar seu código.
 function obterDescontoCategoria(nomeCategoria) {
-    const categorias = [{ nome: 'Alimentação', desconto: 30 }, { nome: 'Infantil', desconto: 15 }];
-    for (let i = 0; i < categorias.length; i++) {
-        if (categorias[i].nome === nomeCategoria) {
-            return categorias[i].desconto;
+    for (let i = 0; i < CATEGORIAS.length; i++) {
+        if (CATEGORIAS[i].nome === nomeCategoria) {
+            return CATEGORIAS[i].desconto;
         }
     }
     return 0;
@@ -94,7 +95,7 @@ function obterProdutosLimitadosAoOrcamento(produtos, precoMaximo) {
 }
 
 // Crie uma função que recebe uma lista de produtos de uma compra,
-// onde cada produto tem também o seu preço e quantidade e retorna o valor total da compra
+// onde cada produto tem também o seu preço e quantidade, retorne o valor total da compra
 function calcularTotalDaCompra(produtos) {
     if (listaEhInvalida(produtos)) {
         return undefined;
@@ -108,8 +109,8 @@ function calcularTotalDaCompra(produtos) {
 // Desejável
 // =========
 
-// Crie uma função que recebe uma lista produtos e retorna um objeto com duas propriedades: menorPreco e maiorPreco.
-// estas propriedades devem conter como valor o produto mais barato e o produto mais caro, respectivamente
+// Crie uma função que recebe uma lista produtos e retorna um objeto com duas propriedades: 'menorPreco' e 'maiorPreco'.
+// estas propriedades devem conter como o produto mais barato e o produto mais caro, respectivamente
 function obterMenorEMaiorPrecos(produtos) {
     if (listaEhInvalida(produtos)) {
         return undefined;
@@ -121,8 +122,8 @@ function obterMenorEMaiorPrecos(produtos) {
     }
 }
 
-// Crie uma função que recebe uma lista de produtos, um valor inferior e um valor superior de orçamento.
-// Retorne uma lista de produtos dentro do orçamento.
+// Crie uma função que recebe uma lista de produtos, um valor inferior e um valor superior de orçamento e 
+// retorna uma lista de produtos dentro do orçamento.
 // Valide se o orçamento está correto, ou seja, se o menor valor é igual ou inferior ao maior valor, caso contrário, retorne undefined.
 function obterProdutosDentroDoOrcamento(produtos, menorValor, maiorValor) {
     if (listaEhInvalida(produtos)) {
@@ -136,11 +137,12 @@ function obterProdutosDentroDoOrcamento(produtos, menorValor, maiorValor) {
     return produtos.filter(p => (p.preco >= menorValor) && (p.preco <= maiorValor));
 }
 
-// Crie uma função que recebe uma categoria e um cupom e aplica um acréscimo de 10% no desconto da categoria, se o cupom for válido
+// Crie uma função que recebe um nome de uma categoria e um objeto cupom e retorna o desconto total,
+// que é a soma do desconto da categoria e a soma do desconto do cupom
 // Utilize a função obterDescontoCategoria criada anteriormente
 function cupomEhValido(cupom) {
     const cuponsValidos = ['NULABSSA', 'ALURANU'];
-    return cuponsValidos.indexOf(cupom.texto) !== -1 && cupom.desconto > 0;
+    return cupom && cupom.texto && cupom.desconto && cuponsValidos.indexOf(cupom.texto) !== -1 && cupom.desconto > 0;
 }
 
 function obterDescontoTotal(categoria, cupom) {
@@ -152,7 +154,7 @@ function obterDescontoTotal(categoria, cupom) {
     }
 }
 
-// Crie uma função que recebe uma lista de produtos, uma lista de categorias de produtos e um cupom.
+// Crie uma função que recebe uma lista de produtos e um cupom de desconto.
 // A função deve retornar o valor total da compra, considerando os descontos de cada categoria e o cupom informado
 function calcularTotalDaCompraComDescontos(produtos, cupom) {
     if (listaEhInvalida(produtos)) {
@@ -170,9 +172,16 @@ function calcularTotalDaCompraComDescontos(produtos, cupom) {
 // =======
 
 // Crie uma classe chamada CarrinhoDeCompras
-// O carrinho deve ter as seguintes funcionalidades:
-// - incluirProduto
-// - listarProdutos
+// O carrinho de compras deve ter as seguintes funcionalidades:
+// - incluirProduto - função recebe um produto e o inclui na lista de produtos
+// - excluirProduto - função recebe um índice e remove o produto naquele índice
+// - listarProdutos - função lista os produtos já incluídos
+// - definirCupom - função recebe um cupom e o armazena
+// - obterCupom - função retorna o cupom armazenado
+// - excluirCupom - função exclui o cupom armazenado
+// - subtotal - função calcula o subtotal da compra - dica: utilizar função calcularTotalDaCompra definida anteriormente;
+// - total - função calcula o total da compra com descontos - dica: utilizar função calcularTotalDaCompraComDescontos definida anteriormente;
+
 class CarrinhoDeCompras {
     constructor() {
         this.produtos = [];
@@ -191,15 +200,19 @@ class CarrinhoDeCompras {
         return [...this.produtos];
     }
 
-    definirCupomDesconto(cupom) {
+    definirCupom(cupom) {
         this.cupom = { ...cupom };
     }
 
-    obterCupomDesconto() {
-        return { ...this.cupom };
+    obterCupom() {
+        if (this.cupom) {
+            return { ...this.cupom };
+        } else {
+            return null;
+        }
     }
 
-    excluirCupomDesconto() {
+    excluirCupom() {
         this.cupom = null;
     }
 

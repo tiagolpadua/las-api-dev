@@ -15,30 +15,35 @@ const {
 const serpentina = {
     nome: "Serpentina",
     categoria: "Infantil",
+    quantidade: 1,
     preco: 30,
 };
 
 const confete = {
     nome: "Confete",
     categoria: "Infantil",
+    quantidade: 4,
     preco: 10,
 };
 
 const refrigerante = {
     nome: "Refrigerante",
     categoria: "Bebida",
+    quantidade: 3,
     preco: 7
 };
 
 const cerveja = {
     nome: "Cerveja",
     categoria: "Bebida",
+    quantidade: 3,
     preco: 8
 };
 
 const sanduiche = {
     nome: "Sanduíche",
     categoria: "Alimentação",
+    quantidade: 5,
     preco: 12
 };
 
@@ -53,24 +58,28 @@ const produtos0 = [
 const espuma = {
     nome: "Espuma",
     categoria: "Infantil",
+    quantidade: 2,
     preco: 10
 };
 
 const batida = {
     nome: "Batida",
     categoria: "Bebida",
+    quantidade: 1,
     preco: 5
 };
 
 const suco = {
     nome: "Suco",
     categoria: "Bebida",
+    quantidade: 1,
     preco: 6
 };
 
 const laranja = {
     nome: "Laranja",
     categoria: "Alimentação",
+    quantidade: 4,
     preco: 9
 };
 
@@ -139,37 +148,22 @@ describe('Essencial', () => {
         expect(calcularTotalDaCompra('foo')).toBeUndefined();
 
         expect(calcularTotalDaCompra([
-            {
-                ...produtos0[0],
-                quantidade: 2,
-            },
-            {
-                ...produtos0[2],
-                quantidade: 1,
-            },
-            {
-                ...produtos0[4],
-                quantidade: 3,
-            },
-        ])).toEqual(103);
+            serpentina,
+            refrigerante,
+            cerveja,
+        ])).toEqual(75);
 
         expect(calcularTotalDaCompra([
-            {
-                ...produtos1[0],
-                quantidade: 1,
-            },
-            {
-                ...produtos1[2],
-                quantidade: 3,
-            },
-            {
-                ...produtos1[4],
-                quantidade: 2,
-            },
-        ])).toEqual(43);
+            confete,
+            batida,
+            suco,
+        ])).toEqual(51);
     });
 });
 
+const cupomNulabssa = { texto: 'NULABSSA', desconto: 10 };
+
+const cupomAluranu = { texto: 'ALURANU', desconto: 15 };
 describe('Desejável', () => {
     test('Deve retornar os produtos com menor e o maior preços.', () => {
         expect(obterMenorEMaiorPrecos([])).toBeUndefined();
@@ -216,19 +210,19 @@ describe('Desejável', () => {
 
     test('Deve retornar o desconto total.', () => {
         expect(
-            obterDescontoTotal('Alimentação', { texto: 'NULABSSA', desconto: 10 }))
+            obterDescontoTotal('Alimentação', cupomNulabssa))
             .toEqual(40);
 
         expect(
-            obterDescontoTotal('Alimentação', { texto: 'ALURANU', desconto: 15 }))
+            obterDescontoTotal('Alimentação', cupomAluranu))
             .toEqual(45);
 
         expect(
-            obterDescontoTotal('Infantil', { texto: 'ALURANU', desconto: 15 }))
+            obterDescontoTotal('Infantil', cupomAluranu))
             .toEqual(30);
 
         expect(
-            obterDescontoTotal('Bebida', { texto: 'ALURANU', desconto: 15 }))
+            obterDescontoTotal('Bebida', cupomAluranu))
             .toEqual(15);
 
         expect(
@@ -254,36 +248,18 @@ describe('Desejável', () => {
         expect(calcularTotalDaCompraComDescontos('foo', [], 'foo')).toBeUndefined();
 
         expect(calcularTotalDaCompraComDescontos([
-            {
-                ...produtos0[0],
-                quantidade: 2,
-            },
-            {
-                ...produtos0[2],
-                quantidade: 1,
-            },
-            {
-                ...produtos0[4],
-                quantidade: 3,
-            }
-        ], { texto: 'ALURANU', desconto: 15 }))
-            .toEqual(87.55);
+            serpentina,
+            refrigerante,
+            cerveja
+        ], cupomAluranu))
+            .toEqual(63.75);
 
         expect(calcularTotalDaCompraComDescontos([
-            {
-                ...produtos1[0],
-                quantidade: 1,
-            },
-            {
-                ...produtos1[2],
-                quantidade: 3,
-            },
-            {
-                ...produtos1[4],
-                quantidade: 2,
-            }
-        ], { texto: 'ALURANU', desconto: 15 }))
-            .toEqual(35.2);
+            confete,
+            espuma,
+            laranja
+        ], cupomAluranu))
+            .toEqual(85.95);
 
 
     });
@@ -294,10 +270,53 @@ describe('Desafio', () => {
         const carrinhoDeCompras = new CarrinhoDeCompras();
         expect(carrinhoDeCompras).toBeDefined();
         expect(carrinhoDeCompras.listarProdutos().length).toBe(0);
-        expect(carrinhoDeCompras.obterCupomDesconto().length).toBeFalsy();
+        expect(carrinhoDeCompras.obterCupom()).toBeFalsy();
     });
 
     test('Deve incluir produto no carrinho.', () => {
         const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.incluirProduto(serpentina);
+        carrinhoDeCompras.incluirProduto(batida);
+
+        expect(carrinhoDeCompras.listarProdutos().length).toBe(2);
     });
+
+    test('Deve excluir produto no carrinho.', () => {
+        const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.incluirProduto(serpentina);
+        carrinhoDeCompras.incluirProduto(batida);
+        carrinhoDeCompras.excluirProduto(1);
+        expect(carrinhoDeCompras.listarProdutos().length).toBe(1);
+    });
+
+    test('Deve listar os produtos do carrinho.', () => {
+        const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.incluirProduto(serpentina);
+        carrinhoDeCompras.incluirProduto(batida);
+        expect(carrinhoDeCompras.listarProdutos().length).toBe(2);
+    });
+
+    test('Deve manter um cupom de desconto.', () => {
+        const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.definirCupom(cupomAluranu);
+        expect(carrinhoDeCompras.obterCupom()).toEqual(cupomAluranu);
+        carrinhoDeCompras.excluirCupom();
+        expect(carrinhoDeCompras.obterCupom()).toBeFalsy();
+    });
+
+    test('Deve calcular o subtotal do carrinho.', () => {
+        const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.incluirProduto(serpentina);
+        carrinhoDeCompras.incluirProduto(batida);
+        carrinhoDeCompras.definirCupom(cupomAluranu);
+        expect(carrinhoDeCompras.subtotal()).toBe(35);
+    });
+
+    test('Deve calcular o subtotal do carrinho.', () => {
+        const carrinhoDeCompras = new CarrinhoDeCompras();
+        carrinhoDeCompras.incluirProduto(serpentina);
+        carrinhoDeCompras.incluirProduto(batida);
+        carrinhoDeCompras.definirCupom(cupomAluranu);
+        expect(carrinhoDeCompras.total()).toBe(25.25);
+    })
 });
