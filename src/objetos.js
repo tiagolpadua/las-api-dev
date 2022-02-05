@@ -1,38 +1,34 @@
 const { listaEhInvalida } = require('./arrays');
 
-// Observação: Para todas funções que recebem listas, se o parâmetro não for uma lista ou se a lista for vazia, retorne undefined.
+//---------------------------------------------------------------------------------------
+// Observações:
+// Para todas funções que recebem listas, se o parâmetro não for uma lista ou se a lista
+// for vazia, retorne undefined.
+//
+// Para todos os objetos das atividades, considere as seguintes estruturas:
+//
+// type Produto = {
+//   nome: string,
+//   categoria: string,
+//   quantidade: number,
+//   preco: number,
+//   precoFormatado: string
+// }
+//
+// type Categoria = {
+//   nome: string,
+//   desconto: number
+// }
+//
+// type Cupom = {
+//   texto: string,
+//   desconto: number
+// }
+//---------------------------------------------------------------------------------------
 
 // =========
 // Essencial
 // =========
-
-// const produtos = [
-//     {
-//         nome: "Serpentina",
-//         categoria: "Infantil",
-//         preco: 30
-//     },
-//     {
-//         nome: "Confete",
-//         categoria: "Infantil",
-//         preco: 10
-//     },
-//     {
-//         nome: "Refrigerante",
-//         categoria: "Bebida",
-//         preco: 7
-//     },
-//     {
-//         nome: "Cerveja",
-//         categoria: "Bebida",
-//         preco: 8
-//     },
-//     {
-//         nome: "Sanduíche",
-//         categoria: "Alimentação",
-//         preco: 12
-//     },
-// ]
 
 // Crie uma função que recebe uma lista de produtos e devolve o produto com o menor preço
 function obterMenorPreco(produtos) {
@@ -173,30 +169,37 @@ function calcularTotalDaCompraComDescontos(produtos, cupom) {
 // Desafio
 // =======
 
-// Crie um objeto chamado CarrinhoDeCompras
-// O carrinho deve ter uma função: incluirProduto
+// Crie uma classe chamada CarrinhoDeCompras
+// O carrinho deve ter as seguintes funcionalidades:
+// - incluirProduto
+// - listarProdutos
 class CarrinhoDeCompras {
     constructor() {
         this.produtos = [];
+        this.cupom = null;
     }
 
-    adicionaProduto(produto) {
+    incluirProduto(produto) {
         this.produtos.push(produto);
     }
 
-    listaProdutos() {
-        return [...this.produtos];
-    }
-
-    removeProduto(indice) {
+    excluirProduto(indice) {
         this.produtos = this.produtos.filter((prod, i) => indice !== i);
     }
 
-    incluiCupomDesconto(cupom) {
+    listarProdutos() {
+        return [...this.produtos];
+    }
+
+    definirCupomDesconto(cupom) {
         this.cupom = { ...cupom };
     }
 
-    removeCupomDesconto() {
+    obterCupomDesconto() {
+        return { ...this.cupom };
+    }
+
+    excluirCupomDesconto() {
         this.cupom = null;
     }
 
