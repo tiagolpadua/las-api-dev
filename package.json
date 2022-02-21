@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest src/**",
+    "test": "jest",
     "test:essencial": "jest -t Essencial",
     "test:desejavel": "jest -t Desejável",
     "test:desafio": "jest -t Desafio",
@@ -12,8 +12,10 @@
     "format": "prettier src/** --write",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
-    "listar": "node src/cli.js listar",
-    "listar-formatado": "node src/cli.js listar-formatado"
+    "cli:produtos": "node src/cli.js produtos",
+    "cli:produtos-formatados": "node src/cli.js produtos-formatados",
+    "cli:categorias": "node src/cli.js categorias",
+    "cli:descontos": "node src/cli.js descontos"
   },
   "engines": {
     "node": "14"
@@ -47,5 +49,16 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "node-fetch": "^2.6.7"
+  },
+  "jest": {
+    "collectCoverage": true,
+    "collectCoverageFrom": [
+      "./src/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "lines": 90
+      }
+    }
   }
 }
