@@ -75,7 +75,9 @@ function obterMaiorPreco(produtos) {
 // chamada 'precoFormatado' com o valor formatado em Reais
 
 function formatarValor(valor) {
-  return `R$ ${valor},00`;
+  return (
+    "R$ " + (Math.round(valor * 100) / 100).toFixed(2).split(".").join(",")
+  );
 }
 
 function incluirPrecoFormatado(produto) {

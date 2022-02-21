@@ -63,9 +63,3 @@ describe("Desejável", () => {
     await expect(processarOpcao()).rejects.toThrow("Informe uma opção.");
   });
 });
-
-describe("Desafio", () => {
-  test("Deve ???.", async () => {
-    expect(true).toEqual(true);
-  });
-});

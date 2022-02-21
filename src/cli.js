@@ -1,10 +1,6 @@
 const { listarProdutos, listarCategorias } = require("./api-service");
 const { formatarValor } = require("./objetos");
 
-function areWeTestingWithJest() {
-  return process.env.JEST_WORKER_ID !== undefined;
-}
-
 async function processarOpcao(opcao) {
   if (!opcao) {
     throw new Error(`Informe uma opção.`);
@@ -43,12 +39,11 @@ async function run() {
   console.table(saida);
 }
 
-if (areWeTestingWithJest()) {
-  console.log("Runnint tests...");
-} else {
+if (require.main === module) {
   run();
 }
 
 module.exports = {
   processarOpcao,
+  formataValorProdutos,
 };
