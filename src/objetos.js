@@ -287,5 +287,6 @@ module.exports = {
   obterProdutosDentroDoOrcamento,
   obterDescontoTotal,
   calcularTotalDaCompraComDescontos,
+  formatarValor,
   CarrinhoDeCompras,
 };
