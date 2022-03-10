@@ -6,7 +6,7 @@ const {
 const { askQuestion } = require("./ask-question");
 const { formatarValor } = require("./objetos");
 
-let opcao = "";
+let opcao;
 let produtos;
 let categorias;
 let cupons;
@@ -25,12 +25,12 @@ async function carregarDadosDaAPI() {
 }
 
 async function run() {
-  carregarDadosDaAPI();
+  await carregarDadosDaAPI();
 
   do {
     imprimirOpcoes();
     opcao = await askQuestion("Opção: ");
-    processarOpcao(opcao);
+    await processarOpcao(opcao);
   } while (opcao !== "x");
 }
 

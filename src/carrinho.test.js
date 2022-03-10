@@ -115,7 +115,6 @@ describe("Desafio", () => {
   test("Deve imprimir o carrinho com a opção 3.", async () => {
     askQuestion.mockResolvedValueOnce("1");
     askQuestion.mockResolvedValueOnce("2");
-    askQuestion.mockResolvedValueOnce("3");
 
     await processarOpcao("2");
     await processarOpcao("3");
@@ -131,6 +130,7 @@ describe("Desafio", () => {
 
   test("Deve concluir a compra com a opção 4.", async () => {
     askQuestion.mockResolvedValueOnce("1");
+    askQuestion.mockResolvedValueOnce("2");
     askQuestion.mockResolvedValueOnce("ALURANUX");
     askQuestion.mockResolvedValueOnce("10");
 
@@ -139,11 +139,11 @@ describe("Desafio", () => {
     await processarOpcao("4");
 
     expect(JSON.stringify(console.table.mock.calls)).toEqual(
-      '[[[{"id":3,"nome":"Refrigerante","categoria":"Bebida","preco":8,"desconto":0,"qtd":1,"valor":8}]]]'
+      '[[[{"id":1,"nome":"Serpentina","categoria":"Infantil","preco":10,"desconto":30,"qtd":2,"valor":14}]]]'
     );
 
     expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Produto incluído com sucesso no carrinho."],["\\n"],["Concluir compra:"],["Subtotal: R$ 8,00"],["Total: R$ 7,20"],["Compra finalizada com sucesso!"],["\\n"]]'
+      '[["Produto incluído com sucesso no carrinho."],["\\n"],["Concluir compra:"],["Subtotal: R$ 14,00"],["Total: R$ 12,60"],["Compra finalizada com sucesso!"],["\\n"]]'
     );
   });
 
