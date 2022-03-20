@@ -14,6 +14,4 @@ function askQuestion(query) {
   );
 }
 
-module.exports = {
-  askQuestion,
-};
+module.exports = askQuestion;

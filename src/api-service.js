@@ -1,40 +1,39 @@
 const fetch = require("node-fetch");
 
-const BASE_PATH = "https://stupefied-keller-a2c79e.netlify.app";
+async function listarProdutosAPI() {
+  const response = await fetch(
+    "https://stupefied-keller-a2c79e.netlify.app/produtos.json"
+  );
 
-function tratarErro(erro) {
-  throw new Error(erro.message);
-}
-
-function verificarResposta(res) {
-  if (res.status >= 400) {
-    tratarErro({ message: `${res.statusText}: ${res.status}` });
+  if (response.status === 200) {
+    return await response.json();
+  } else {
+    throw new Error(`${response.statusText}: ${response.status}`);
   }
 }
 
-async function doGet(path) {
-  const response = await fetch(path);
-  verificarResposta(response);
-  const data = await response.json();
-  return data;
+async function listarCategoriasAPI() {
+  const response = await fetch(
+    "https://stupefied-keller-a2c79e.netlify.app/categorias.json"
+  );
+
+  if (response.status === 200) {
+    return await response.json();
+  } else {
+    throw new Error(`${response.statusText}: ${response.status}`);
+  }
 }
 
-async function listarProdutos() {
-  return await doGet(BASE_PATH + "/produtos.json");
+async function listarCuponsAPI() {
+  const response = await fetch(
+    "https://stupefied-keller-a2c79e.netlify.app/cupons.json"
+  );
+
+  if (response.status === 200) {
+    return await response.json();
+  } else {
+    throw new Error(`${response.statusText}: ${response.status}`);
+  }
 }
 
-async function listarCategorias() {
-  return await doGet(BASE_PATH + "/categorias.json");
-}
-
-async function listarCuponsValidos() {
-  return await doGet(BASE_PATH + "/cupons.json");
-}
-
-module.exports = {
-  tratarErro,
-  verificarResposta,
-  listarProdutos,
-  listarCategorias,
-  listarCuponsValidos,
-};
+module.exports = { listarProdutosAPI, listarCategoriasAPI, listarCuponsAPI };

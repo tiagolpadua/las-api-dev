@@ -1,124 +1,121 @@
 const {
-  listarProdutos,
-  listarCategorias,
-  listarCuponsValidos,
+  listarProdutosAPI,
+  listarCategoriasAPI,
+  listarCuponsAPI,
 } = require("./api-service");
-const { askQuestion } = require("./ask-question");
-const { formatarValor } = require("./objetos");
+const askQuestion = require("./ask-question");
+const { formatarPrecoProdutos } = require("./cli");
 
-let opcao;
-let produtos;
-let categorias;
-let cupons;
-let carrinho = [];
-
-async function carregarDadosDaAPI() {
-  produtos = await listarProdutos();
-  categorias = await listarCategorias();
-  cupons = await listarCuponsValidos();
-
-  produtos = produtos.map((p) => {
-    const categoria = categorias.find((c) => p.categoria === c.nome);
-    const produto = { ...p, desconto: categoria?.desconto || 0 };
-    return produto;
-  });
-}
+const carrinhoDeCompras = [];
 
 async function run() {
-  await carregarDadosDaAPI();
-
   do {
-    imprimirOpcoes();
-    opcao = await askQuestion("Opção: ");
-    await processarOpcao(opcao);
-  } while (opcao !== "x");
+    mostrarMenu();
+    var opcao = await askQuestion("Opção: ");
+    await tratarOpcao(opcao);
+  } while (opcao != "x");
 }
 
-function imprimirOpcoes() {
+function mostrarMenu() {
   console.log("Escolha uma opção:");
-  console.log("1 - Listar produtos");
-  console.log("2 - Incluir produto no carrinho");
-  console.log("3 - Visualizar carrinho");
-  console.log("4 - Finalizar compra");
+  console.log("1 - Listar Produtos");
+  console.log("2 - Incluir Produto no Carinho");
+  console.log("3 - Visualizar Carrinho");
+  console.log("4 - Finalizar Compra");
   console.log("x - Sair");
 }
 
-async function processarOpcao(opcao) {
-  if (opcao === "1") {
-    console.log("Lista de Produtos:");
-    console.table(produtos);
-  } else if (opcao === "2") {
-    let codProduto = await askQuestion(
-      "Qual código de produto deseja incluir no carrinho?"
-    );
-    codProduto = parseInt(codProduto);
-    const produto = produtos[codProduto];
-    if (!produto) {
-      console.error(`Produto não localizado: ${codProduto}`);
-      return;
-    }
-    let qtd = await askQuestion(
-      "Quantas unidades deseja adicionar ao carrinho?"
-    );
-    qtd = parseInt(qtd);
-    if (!qtd) {
-      console.error(`Quantidade inválida: ${qtd}`);
-      return;
-    }
-    let item = carrinho.find((i) => i.id === codProduto);
-    if (item) {
-      item.qtd = item.qtd + qtd;
-      item.valor = item.preco * item.qtd;
-      item.valor = item.valor - item.valor * (item.desconto / 100);
-    } else {
-      item = { id: codProduto, ...produto, qtd, valor: produto.preco * qtd };
-      item.valor = item.valor - item.valor * (item.desconto / 100);
-      carrinho.push(item);
-    }
-    console.log("Produto incluído com sucesso no carrinho.");
-  } else if (opcao === "3") {
-    console.log("Carrinho de Compras:");
-    console.table(carrinho);
-  } else if (opcao === "4") {
-    console.log("Concluir compra:");
-    console.table(carrinho);
-    const subtotal = carrinho.reduce((v, i) => i.valor + v, 0);
-    console.log(`Subtotal: ${formatarValor(subtotal)}`);
-    let cupom = await askQuestion("Qual o nome do cupom?");
-    let descontoCupom = 0;
-    if (cupom) {
-      if (!cupons.find((c) => c === cupom)) {
-        console.error("Cupom inválido");
-        return;
-      }
+async function tratarOpcao(opcao) {
+  const produtos = await listarProdutosAPI();
+  const cupons = await listarCuponsAPI();
 
-      descontoCupom = await askQuestion("Qual o desconto do cupom?");
-      descontoCupom = parseInt(descontoCupom);
-    }
-    const total = subtotal - subtotal * (descontoCupom / 100);
-    console.log(`Total: ${formatarValor(total)}`);
-    console.log("Compra finalizada com sucesso!");
-  } else if (opcao === "x") {
-    console.log("Adeus...");
-  } else {
-    console.error(`Opção inválida: ${opcao}`);
+  switch (opcao) {
+    case "1":
+      console.table(formatarPrecoProdutos(produtos));
+      break;
+
+    case "2":
+      var codigoProduto = await askQuestion(
+        "Qual código do produto deseja incluir no carinho? "
+      );
+      var qntdProduto = await askQuestion(
+        "Quantas unidades deseja adicionar ao carrinho? "
+      );
+      if (codigoProduto < 0 || codigoProduto > produtos.length - 1) {
+        return undefined;
+      }
+      if (qntdProduto < 0 || isNaN(qntdProduto)) {
+        return undefined;
+      }
+      var categorias = await listarCategoriasAPI();
+      var produtoSelecionado = selecionaProduto(produtos, codigoProduto);
+
+      var categoriaProduto = await categorias.find(
+        (categoria) => categoria.nome === produtoSelecionado.categoria
+      );
+
+      produtoSelecionado["desconto"] =
+        categoriaProduto !== undefined ? categoriaProduto.desconto : 0;
+
+      produtoSelecionado = {
+        id: parseInt(codigoProduto),
+        ...produtoSelecionado,
+      };
+
+      produtoSelecionado["quantidade"] = parseInt(qntdProduto);
+      produtoSelecionado["valor"] =
+        produtoSelecionado.preco * produtoSelecionado.quantidade;
+
+      carrinhoDeCompras.push(produtoSelecionado);
+      console.table(produtoSelecionado);
+      break;
+    case "3":
+      console.clear();
+      console.table(carrinhoDeCompras);
+      return carrinhoDeCompras;
+    case "4":
+      var nomeCupom = await askQuestion("Qual o nome do cupom? ");
+      var descontoCupom = cupons.includes(nomeCupom) ? 10 : 0;
+
+      var comprovanteCompraFinalizada = finalizarCompra(
+        carrinhoDeCompras,
+        descontoCupom
+      );
+      console.log(comprovanteCompraFinalizada);
+      break;
+    default:
+      return "Informe uma opção válida!";
   }
-  console.log("\n");
+}
+
+function finalizarCompra(carrinhoDeCompras, descontoCupom) {
+  var subtotal = 0;
+  var total = 0;
+  var comprovanteCompra = "";
+
+  for (const item of carrinhoDeCompras) {
+    subtotal +=
+      item.preco * item.quantidade - item.preco * (item.desconto / 100);
+  }
+  total = subtotal - subtotal * (descontoCupom / 100);
+  comprovanteCompra += `Subtotal: R$ ${subtotal}\n`;
+  comprovanteCompra += `Desconto do cupom é: ${descontoCupom}%\n`;
+  comprovanteCompra += `Total: ${total}\n`;
+  comprovanteCompra += "Compra finalizada com sucesso\n";
+  return comprovanteCompra;
+}
+
+function selecionaProduto(listaProdutos, indiceProduto) {
+  const indice = parseInt(indiceProduto);
+  return listaProdutos[indice];
 }
 
 if (require.main === module) {
   run();
 }
 
-function esvaziarCarrinho() {
-  carrinho = [];
-}
-
 module.exports = {
-  run,
-  esvaziarCarrinho,
-  askQuestion,
-  imprimirOpcoes,
-  processarOpcao,
-  carregarDadosDaAPI,
+  tratarOpcao,
+  finalizarCompra,
+  mostrarMenu,
 };

@@ -1,6 +1,6 @@
 const readline = require("readline");
 
-const { askQuestion } = require("./ask-question");
+const askQuestion = require("./ask-question");
 
 describe("Desafio", () => {
   test("Deve perguntar uma opção.", async () => {

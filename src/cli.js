@@ -1,36 +1,27 @@
-const { listarProdutos, listarCategorias } = require("./api-service");
-const { formatarValor } = require("./objetos");
+const { listarProdutosAPI, listarCategoriasAPI } = require("./api-service");
 
 async function processarOpcao(opcao) {
-  if (!opcao) {
-    throw new Error(`Informe uma opção.`);
-  } else if (opcao === "produtos") {
-    const produtos = await listarProdutos();
-    return produtos;
-  } else if (opcao === "produtos-formatados") {
-    let produtos = await listarProdutos();
-    produtos = formataValorProdutos(produtos);
-    return produtos;
-  } else if (opcao === "categorias") {
-    const categorias = await listarCategorias();
-    return categorias;
-  } else if (opcao === "descontos") {
-    let produtos = await listarProdutos();
-    produtos = formataValorProdutos(produtos);
-    const categorias = await listarCategorias();
-    produtos = produtos.map((p) => {
-      const categoria = categorias.find((c) => p.categoria === c.nome);
-      const produto = { ...p, desconto: categoria?.desconto || 0 };
-      return produto;
-    });
-    return produtos;
-  } else {
-    throw new Error(`Opção inválida: ${opcao}`);
-  }
-}
+  switch (opcao) {
+    case "produtos":
+      return await listarProdutosAPI();
+    case "categorias":
+      return await listarCategoriasAPI();
+    case "produtos-formatados":
+      return formatarPrecoProdutos(await listarProdutosAPI());
+    case "descontos":
+      var produtosFormatados = formatarPrecoProdutos(await listarProdutosAPI());
+      var categorias = await listarCategoriasAPI();
+      var produtosComDesconto = adicionaDescontoCategoria(
+        produtosFormatados,
+        categorias
+      );
 
-function formataValorProdutos(produtos) {
-  return produtos.map((p) => ({ ...p, preco: formatarValor(p.preco) }));
+      return produtosComDesconto;
+    case undefined:
+      throw new Error("Informe uma opção.");
+    default:
+      throw new Error(`Opção inválida: ${opcao}`);
+  }
 }
 
 async function run() {
@@ -43,7 +34,34 @@ if (require.main === module) {
   run();
 }
 
+function formatarPrecoProdutos(listaProdutos) {
+  let listaProdutosFormatados = JSON.parse(JSON.stringify(listaProdutos));
+  listaProdutosFormatados.forEach((produto) => {
+    produto.preco = formataPreco(produto.preco);
+  });
+
+  return listaProdutosFormatados;
+}
+
+function formataPreco(preco) {
+  return `R$ ${parseFloat(preco).toFixed(2).toString().replace(".", ",")}`;
+}
+
+function adicionaDescontoCategoria(listaProdutos, categorias) {
+  let listaProdutosComDesconto = JSON.parse(JSON.stringify(listaProdutos));
+
+  listaProdutosComDesconto.forEach((produto) => {
+    const indexCategoria = categorias.findIndex(
+      (categoria) => categoria.nome === produto.categoria
+    );
+
+    produto.desconto =
+      indexCategoria !== -1 ? categorias[indexCategoria].desconto : 0;
+  });
+  return listaProdutosComDesconto;
+}
+
 module.exports = {
   processarOpcao,
-  formataValorProdutos,
+  formatarPrecoProdutos,
 };

@@ -1,25 +1,11 @@
-const {
-  listarProdutos,
-  listarCategorias,
-  listarCuponsValidos,
-} = require("./api-service");
-
-const { askQuestion } = require("./ask-question");
+const PRODUTOS_MOCK = require("../mocks/produtos.json");
+const CATEGORIAS_MOCK = require("../mocks/categorias.json");
+const { listarProdutosAPI, listarCategoriasAPI } = require("./api-service");
+const { tratarOpcao, finalizarCompra, mostrarMenu } = require("./carrinho");
+const askQuestion = require("./ask-question");
 
 jest.mock("./api-service");
 jest.mock("./ask-question");
-
-const {
-  imprimirOpcoes,
-  carregarDadosDaAPI,
-  processarOpcao,
-  run,
-  esvaziarCarrinho,
-} = require("./carrinho");
-
-const PRODUTOS_MOCK = require("../mocks/produtos.json");
-const CATEGORIAS_MOCK = require("../mocks/categorias.json");
-const CUPONS_MOCK = require("../mocks/cupons.json");
 
 describe("Desafio", () => {
   // Crie uma interface com testes em linha de comandos que:
@@ -29,135 +15,111 @@ describe("Desafio", () => {
   // 4 - Finalize a compra e pergunte pelo cupom de desconto
   // x - Saia do sistema
 
-  beforeEach(() => {
+  test("Deve listar o menu", () => {
     console.log = jest.fn();
-    console.table = jest.fn();
-    console.error = jest.fn();
-    listarProdutos.mockResolvedValue(PRODUTOS_MOCK);
-    listarCategorias.mockResolvedValue(CATEGORIAS_MOCK);
-    listarCuponsValidos.mockResolvedValue(CUPONS_MOCK);
-    carregarDadosDaAPI();
-    esvaziarCarrinho();
-    askQuestion.mockClear();
-  });
-
-  test("Deve imprimir as opções.", () => {
-    imprimirOpcoes();
+    mostrarMenu();
     expect(console.log.mock.calls).toEqual([
       ["Escolha uma opção:"],
-      ["1 - Listar produtos"],
-      ["2 - Incluir produto no carrinho"],
-      ["3 - Visualizar carrinho"],
-      ["4 - Finalizar compra"],
+      ["1 - Listar Produtos"],
+      ["2 - Incluir Produto no Carinho"],
+      ["3 - Visualizar Carrinho"],
+      ["4 - Finalizar Compra"],
       ["x - Sair"],
     ]);
   });
 
-  test("Deve sair se informar x.", async () => {
-    askQuestion.mockResolvedValue("x");
-    await run();
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Escolha uma opção:"],["1 - Listar produtos"],["2 - Incluir produto no carrinho"],["3 - Visualizar carrinho"],["4 - Finalizar compra"],["x - Sair"],["Adeus..."],["\\n"]]'
-    );
+  test("Deve listar os produtos.", async () => {
+    listarProdutosAPI.mockResolvedValue(PRODUTOS_MOCK);
+    console.table = jest.fn();
+
+    await tratarOpcao("1");
+    expect(console.table.mock.calls).toEqual([
+      [
+        [
+          { categoria: "Infantil", nome: "Confete", preco: "R$ 30,00" },
+          { categoria: "Infantil", nome: "Serpentina", preco: "R$ 10,00" },
+          { categoria: "Bebida", nome: "Cerveja", preco: "R$ 7,00" },
+          { categoria: "Bebida", nome: "Refrigerante", preco: "R$ 8,00" },
+          { categoria: "Alimentação", nome: "Fruta", preco: "R$ 12,00" },
+        ],
+      ],
+    ]);
   });
 
-  test("Deve recusar uma opção inválida.", async () => {
-    processarOpcao("999");
-    expect(JSON.stringify(console.error.mock.calls)).toEqual(
-      '[["Opção inválida: 999"]]'
-    );
-  });
+  test("Deve incluir um produto no Carrinho.", async () => {
+    listarProdutosAPI.mockResolvedValue(PRODUTOS_MOCK);
+    listarCategoriasAPI.mockResolvedValue(CATEGORIAS_MOCK);
 
-  test("Deve listar os produtos com a opção 1.", async () => {
-    processarOpcao("1");
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Lista de Produtos:"],["\\n"]]'
-    );
-    expect(JSON.stringify(console.table.mock.calls)).toEqual(
-      '[[[{"nome":"Confete","categoria":"Infantil","preco":30,"desconto":30},{"nome":"Serpentina","categoria":"Infantil","preco":10,"desconto":30},{"nome":"Cerveja","categoria":"Bebida","preco":7,"desconto":0},{"nome":"Refrigerante","categoria":"Bebida","preco":8,"desconto":0},{"nome":"Fruta","categoria":"Alimentação","preco":12,"desconto":15}]]]'
-    );
-  });
+    console.table = jest.fn();
 
-  test("Não deve incluir um produto no carrinho com a opção 2 se o código for inválido.", async () => {
-    askQuestion.mockResolvedValue("999999");
-    await processarOpcao("2");
-    expect(JSON.stringify(console.error.mock.calls)).toEqual(
-      '[["Produto não localizado: 999999"]]'
-    );
-  });
-
-  test("Não deve incluir um produto no carrinho com a opção 2 se a quantidade for inválida.", async () => {
-    askQuestion.mockResolvedValueOnce("1");
-    askQuestion.mockResolvedValueOnce("a");
-    await processarOpcao("2");
-    expect(JSON.stringify(console.error.mock.calls)).toEqual(
-      '[["Quantidade inválida: NaN"]]'
-    );
-  });
-
-  test("Deve incluir um produto no carrinho com a opção 2 se o código do produto e a quantidade estiverem corretos.", async () => {
-    askQuestion.mockResolvedValueOnce("1");
     askQuestion.mockResolvedValueOnce("2");
-    await processarOpcao("2");
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Produto incluído com sucesso no carrinho."],["\\n"]]'
-    );
-
-    askQuestion.mockResolvedValueOnce("1");
     askQuestion.mockResolvedValueOnce("2");
-    await processarOpcao("2");
-
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Produto incluído com sucesso no carrinho."],["\\n"],["Produto incluído com sucesso no carrinho."],["\\n"]]'
-    );
+    await tratarOpcao("2");
+    expect(console.table.mock.calls).toEqual([
+      [
+        {
+          categoria: "Bebida",
+          desconto: 0,
+          id: 2,
+          nome: "Cerveja",
+          preco: 7,
+          quantidade: 2,
+          valor: 14,
+        },
+      ],
+    ]);
   });
 
-  test("Deve imprimir o carrinho com a opção 3.", async () => {
-    askQuestion.mockResolvedValueOnce("1");
-    askQuestion.mockResolvedValueOnce("2");
+  test("Deve retornar o carrinho de compras", async () => {
+    const carrinhoDeCompras = await tratarOpcao("3");
 
-    await processarOpcao("2");
-    await processarOpcao("3");
-
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Produto incluído com sucesso no carrinho."],["\\n"],["Carrinho de Compras:"],["\\n"]]'
-    );
-
-    expect(JSON.stringify(console.table.mock.calls)).toEqual(
-      '[[[{"id":1,"nome":"Serpentina","categoria":"Infantil","preco":10,"desconto":30,"qtd":2,"valor":14}]]]'
-    );
+    expect(carrinhoDeCompras).toBeInstanceOf(Array);
   });
 
-  test("Deve concluir a compra com a opção 4.", async () => {
-    askQuestion.mockResolvedValueOnce("1");
-    askQuestion.mockResolvedValueOnce("2");
-    askQuestion.mockResolvedValueOnce("ALURANUX");
-    askQuestion.mockResolvedValueOnce("10");
+  test("Deve retornar uma compra finalizada", async () => {
+    const carrinhoDeCompras = [
+      {
+        id: 4,
+        nome: "Sanduíche",
+        categoria: "Alimentação",
+        preco: 12,
+        desconto: 30,
+        quantidade: 2,
+        valor: 24,
+      },
+      {
+        id: 0,
+        nome: "Serpentina",
+        categoria: "Infantil",
+        preco: 30,
+        desconto: 15,
+        quantidade: 2,
+        valor: 60,
+      },
+      {
+        id: 1,
+        nome: "Confete",
+        categoria: "Infantil",
+        preco: 10,
+        desconto: 15,
+        quantidade: 3,
+        valor: 30,
+      },
+    ];
+    const comprovanteCompraFinalizada =
+      "Subtotal: R$ 104.4\n" +
+      "Desconto do cupom é: 0%\n" +
+      "Total: 104.4\n" +
+      "Compra finalizada com sucesso\n";
+    const compraFinalizada = finalizarCompra(carrinhoDeCompras, 0);
 
-    await processarOpcao("2");
-
-    await processarOpcao("4");
-
-    expect(JSON.stringify(console.table.mock.calls)).toEqual(
-      '[[[{"id":1,"nome":"Serpentina","categoria":"Infantil","preco":10,"desconto":30,"qtd":2,"valor":14}]]]'
-    );
-
-    expect(JSON.stringify(console.log.mock.calls)).toEqual(
-      '[["Produto incluído com sucesso no carrinho."],["\\n"],["Concluir compra:"],["Subtotal: R$ 14,00"],["Total: R$ 12,60"],["Compra finalizada com sucesso!"],["\\n"]]'
-    );
+    expect(compraFinalizada).toEqual(comprovanteCompraFinalizada);
   });
 
-  test("Deve recusar a compra com a opção 4 com cupom inválido.", async () => {
-    askQuestion.mockResolvedValueOnce("1");
-    askQuestion.mockResolvedValueOnce("2");
-    askQuestion.mockResolvedValueOnce("CUPOM-INVALIDO");
-
-    await processarOpcao("2");
-
-    await processarOpcao("4");
-
-    expect(JSON.stringify(console.error.mock.calls)).toEqual(
-      '[["Cupom inválido"]]'
-    );
+  test("Deve solicitar uma opção válida.", async () => {
+    expect(await tratarOpcao("9")).toEqual("Informe uma opção válida!");
+    expect(await tratarOpcao()).toEqual("Informe uma opção válida!");
   });
+
+  test("Deve executar a função apenas uma vez", async () => {});
 });
