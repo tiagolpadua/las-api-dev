@@ -4,4 +4,7 @@
     "editor.codeActionsOnSave": {
         "source.fixAll.eslint": true
     },
+    "[sql]": {
+        "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
+    },
 }

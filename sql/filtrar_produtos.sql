@@ -1,0 +1,6 @@
+SELECT
+    PRECO
+FROM
+    PRODUTOS
+WHERE
+    NOME LIKE 'C%';
