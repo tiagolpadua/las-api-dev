@@ -5,11 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "test:essencial": "jest -t Essencial",
-    "test:desejavel": "jest -t Desejável",
-    "test:desafio": "jest -t Desafio",
+    "test:essencial": "jest -t Essencial --coverage=false",
+    "test:desejavel": "jest -t Desejável --coverage=false",
+    "test:desafio": "jest -t Desafio --coverage=false",
     "test:watch": "jest --watch",
-    "format": "prettier src/** --write",
     "lint": "eslint src/**",
     "lint:fix": "eslint src/** --fix",
     "cli:produtos": "node src/cli.js produtos",
@@ -46,11 +45,6 @@
   "pre-commit": [
     "lint"
   ],
-  "dependencies": {
-    "chalk": "^4.1.2",
-    "node-fetch": "^2.6.7",
-    "sqlite3": "^5.0.2"
-  },
   "jest": {
     "collectCoverage": true,
     "collectCoverageFrom": [
@@ -61,5 +55,9 @@
         "lines": 90
       }
     }
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.7",
+    "sqlite3": "^5.0.2"
   }
 }
