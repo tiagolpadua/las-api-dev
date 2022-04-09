@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node src/app.js",
     "test": "jest",
     "test:essencial": "jest -t Essencial --coverage=false",
     "test:desejavel": "jest -t Desejável --coverage=false",
@@ -57,6 +58,8 @@
     }
   },
   "dependencies": {
+    "express": "^4.17.3",
+    "mysql": "^2.18.1",
     "node-fetch": "^2.6.7",
     "sqlite3": "^5.0.2"
   }
