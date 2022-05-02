@@ -1,18 +1,19 @@
 class Tabelas {
-  init(conexao) {
-    this.conexao = conexao;
+  init(pool) {
+    this.pool = pool;
+
     this.criarUsuarios();
   }
 
   criarUsuarios() {
     const sql =
-      "CREATE TABLE IF NOT EXISTS Usuarios (id int NOT NULL AUTO_INCREMENT, nome varchar(50) NOT NULL, urlFotoPerfil varchar(50) NOT NULL, PRIMARY KEY(id))";
+      "CREATE TABLE IF NOT EXISTS Usuarios(id INT AUTO_INCREMENT NOT NULL, nome varchar(100) NOT NULL, urlFotoPerfil text, UNIQUE (nome), PRIMARY KEY(id))";
 
-    this.conexao.query(sql, (erro) => {
+    this.pool.query(sql, (erro) => {
       if (erro) {
         console.log(erro);
       } else {
-        console.log("Tabela Usuários criada com sucesso!");
+        console.log("Tabela Usuarios criada com sucesso");
       }
     });
   }

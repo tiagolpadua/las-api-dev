@@ -1,42 +1,39 @@
-const conexao = require("../infraestrutura/conexao");
-const http = require("http");
-const https = require("https");
+const pool = require("../infraestrutura/conexao");
+const fetch = require("node-fetch");
 
-class Usuario {
-  async validarURLFotoPerfil(url) {
-    return new Promise((resolve) => {
-      try {
-        (url.startsWith("https") ? https : http)
-          .request(url, { method: "HEAD" }, () => resolve(true))
-          .on("error", () => resolve(false))
-          .end();
-      } catch (err) {
-        resolve(false);
+class Usuarios {
+  listar(res, next) {
+    const sql = "SELECT * FROM Usuarios";
+    pool.query(sql, (erro, resultados) => {
+      if (erro) {
+        next(erro);
+      } else {
+        res.status(200).json(resultados);
       }
     });
   }
 
-  async validarNomeUsuarioNaoUtilizado(nome) {
-    return new Promise((resolve) => {
-      const sql = `SELECT * FROM Usuarios WHERE nome='${nome}'`;
-      conexao.query(sql, (erro, resultados) => {
-        if (erro) {
-          resolve(false);
+  buscarPorId(id, res, next) {
+    const sql = "SELECT * FROM Usuarios WHERE id = ?";
+    pool.query(sql, id, (erro, resultados) => {
+      const usuario = resultados[0];
+      if (erro) {
+        next(erro);
+      } else {
+        if (usuario) {
+          res.status(200).json(usuario);
         } else {
-          if (resultados.length > 0) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
+          res.status(404).end();
         }
-      });
+      }
     });
   }
 
-  async adicionar(usuario, res) {
+  async adicionar(usuario, res, next) {
     const nomeEhValido =
       usuario.nome.length > 0 &&
       (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
+
     const urlEhValida = await this.validarURLFotoPerfil(usuario.urlFotoPerfil);
 
     const validacoes = [
@@ -60,9 +57,9 @@ class Usuario {
     } else {
       const sql = "INSERT INTO Usuarios SET ?";
 
-      conexao.query(sql, usuario, (erro) => {
+      pool.query(sql, usuario, (erro) => {
         if (erro) {
-          res.status(400).json(erro);
+          next(erro);
         } else {
           res.status(201).json(usuario);
         }
@@ -70,77 +67,74 @@ class Usuario {
     }
   }
 
-  listar(res) {
-    const sql = "SELECT * FROM Usuarios";
-    conexao.query(sql, (erro, resultados) => {
+  alterar(id, valores, res, next) {
+    const sql = "UPDATE Usuarios SET ? WHERE id = ?";
+    pool.query(sql, [valores, id], (erro) => {
       if (erro) {
-        res.status(400).json(erro);
+        next(erro);
+      } else {
+        res.status(200).json(valores);
+      }
+    });
+  }
+
+  excluir(id, res, next) {
+    const sql = "DELETE FROM Usuarios WHERE id = ?";
+    pool.query(sql, id, (erro) => {
+      if (erro) {
+        next(erro);
+      } else {
+        res.status(200).json({ id });
+      }
+    });
+  }
+
+  buscarPorNome(nome, res, next) {
+    const sql = "SELECT * FROM Usuarios WHERE nome like ?";
+    pool.query(sql, "%" + nome + "%", (erro, resultados) => {
+      if (erro) {
+        next(erro);
       } else {
         res.status(200).json(resultados);
       }
     });
   }
 
-  buscarPorId(id, res) {
-    const sql = `SELECT * FROM Usuarios WHERE id=${id}`;
-
-    conexao.query(sql, (erro, resultados) => {
-      const usuario = resultados[0];
-      if (erro) {
-        res.status(400).json(erro);
-      } else {
-        if (usuario) {
-          res.status(200).json(usuario);
-        } else {
-          res.status(404).end();
-        }
+  async validarURLFotoPerfil(url) {
+    try {
+      const regex =
+        /https?:\/\/(www.)?[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*)/gm;
+      const verificaUrl = url.match(regex);
+      if (!verificaUrl) {
+        return false;
       }
-    });
+      const response = await fetch(url);
+      if (response.status !== 200) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch {
+      return false;
+    }
   }
 
-  buscarPorNome(nome, res) {
-    const sql = `SELECT * FROM Usuarios WHERE nome like %${nome}%`;
-
-    conexao.query(sql, (erro, resultados) => {
-      if (erro) {
-        res.status(400).json(erro);
-      } else {
-        if (resultados.length > 0) {
-          res.status(200).json(resultados);
+  async validarNomeUsuarioNaoUtilizado(nome) {
+    return new Promise((resolve) => {
+      const sql = "SELECT * FROM Usuarios WHERE nome = ?";
+      pool.query(sql, nome, (erro, resultados) => {
+        if (erro) {
+          resolve(false);
         } else {
-          res.status(404).end();
+          if (resultados.length > 0) {
+            resolve(false);
+          } else {
+            resolve(true);
+          }
         }
-      }
-    });
-  }
-
-  alterar(id, valores, res) {
-    const sql = "UPDATE Usuarios SET ? WHERE id=?";
-
-    conexao.query(sql, [valores, id], (erro) => {
-      if (erro) {
-        res.status(400).json(erro);
-      } else {
-        res.status(200).json({ ...valores, id });
-      }
-    });
-  }
-
-  excluir(id, res) {
-    const sql = "DELETE FROM Usuarios WHERE id=?";
-
-    conexao.query(sql, id, (erro, resultado) => {
-      if (erro) {
-        res.status(400).json(erro);
-      } else {
-        if (resultado.affectedRows > 0) {
-          res.status(200).json({ id });
-        } else {
-          res.status(404).end();
-        }
-      }
+      });
     });
   }
 }
 
-module.exports = new Usuario();
+module.exports = new Usuarios();

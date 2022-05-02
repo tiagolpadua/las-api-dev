@@ -1,33 +1,33 @@
-const Usuario = require("../models/usuarios");
+const Usuarios = require("../models/usuarios");
 
 module.exports = (app) => {
-  app.get("/usuarios", (req, res) => {
-    Usuario.listar(res);
+  app.get("/usuarios", (req, res, next) => {
+    Usuarios.listar(res, next);
   });
 
-  app.get("/usuarios/:id", (req, res) => {
+  app.get("/usuarios/:id", (req, res, next) => {
     const id = parseInt(req.params.id);
-    Usuario.buscarPorId(id, res);
+    Usuarios.buscarPorId(id, res, next);
   });
 
-  app.get("/usuarios/nome/:nome", (req, res) => {
-    Usuario.buscarPorNome(req.params.nome, res);
+  app.post("/usuarios", (req, res, next) => {
+    const usuarios = req.body;
+    Usuarios.adicionar(usuarios, res, next);
   });
 
-  app.post("/usuarios", async (req, res) => {
-    const usuario = req.body;
-    await Usuario.adicionar(usuario, res);
-  });
-
-  app.put("/usuarios/:id", (req, res) => {
+  app.put("/usuarios/:id", (req, res, next) => {
     const id = parseInt(req.params.id);
     const valores = req.body;
-
-    Usuario.alterar(id, valores, res);
+    Usuarios.alterar(id, valores, res, next);
   });
 
-  app.delete("/usuarios/:id", (req, res) => {
+  app.delete("/usuarios/:id", (req, res, next) => {
     const id = parseInt(req.params.id);
-    Usuario.excluir(id, res);
+    Usuarios.excluir(id, res, next);
+  });
+
+  app.get("/usuarios/nome/:nome", (req, res, next) => {
+    const nome = req.params.nome;
+    Usuarios.buscarPorNome(nome, res, next);
   });
 };

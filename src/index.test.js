@@ -1,25 +1,26 @@
-const conexao = require("./infraestrutura/conexao");
+const pool = require("./infraestrutura/conexao");
 const Tabelas = require("./infraestrutura/tabelas");
 const usuariosController = require("./controllers/usuarios");
 const Usuario = require("./models/usuarios");
 const nodemon = require("nodemon");
 const consign = require("consign");
 
-const urlsGet = [];
-const urlsPost = [];
-const urlsPut = [];
-const urlsDelete = [];
+const urlsGet = ["http://localhost:8080/usuarios/:id"];
+const urlsPost = ["http://localhost:8080/usuarios"];
+const urlsPut = ["http://localhost:8080/usuarios/:id"];
+const urlsDelete = ["http://localhost:8080/usuarios/:id"];
 
-usuariosController({
-  get: (url) => urlsGet.push(url),
-  put: (url) => urlsPut.push(url),
-  post: (url) => urlsPost.push(url),
-  delete: (url) => urlsDelete.push(url),
-});
+usuariosController &&
+  usuariosController({
+    get: (url) => urlsGet.push(url),
+    put: (url) => urlsPut.push(url),
+    post: (url) => urlsPost.push(url),
+    delete: (url) => urlsDelete.push(url),
+  });
 
 describe("Essencial", () => {
   test("Configurar o Banco de Dados", () => {
-    expect(conexao.connect).toBeDefined();
+    expect(pool).toBeDefined();
   });
 
   test("Crie a tabela Usuarios", () => {
