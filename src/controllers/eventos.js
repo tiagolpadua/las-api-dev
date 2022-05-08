@@ -14,23 +14,31 @@ module.exports = (app) => {
       .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.post("/eventos", (req, res, next) => {
-    // TODO
+    const evento = req.body;
+    Eventos.adicionar(evento)
+      .then((resultado) => res.json(resultado))
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.put("/eventos/:id", (req, res, next) => {
-    // TODO
+    const id = parseInt(req.params.id);
+    const valores = req.body;
+    Eventos.alterar(id, valores)
+      .then(() => res.json(valores))
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.delete("/eventos/:id", (req, res, next) => {
-    // TODO
+    const id = parseInt(req.params.id);
+    Eventos.excluir(id)
+      .then(() => res.status(204).send())
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.get("/eventos/status/:status", (req, res, next) => {
-    // TODO
+    Eventos.listarPorStatus(req.params.status)
+      .then((resultado) => res.json(resultado))
+      .catch((erros) => next(erros));
   });
 };

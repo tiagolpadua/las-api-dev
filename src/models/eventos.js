@@ -1,7 +1,6 @@
-// const pool = require("../infraestrutura/database/conexao");
-// const fetch = require("node-fetch");
 const repositorio = require("../repositorios/evento");
 const moment = require("moment");
+const { isURLValida } = require("../infraestrutura/validacoes");
 
 class Eventos {
   listar() {
@@ -16,99 +15,86 @@ class Eventos {
     let datasSaoValidas = false;
 
     if (evento.dataInicio && evento.dataFim) {
-      const dataInicio = moment(evento.dataInicio, "YYYY-MM-DD");
-      const dataFim = moment(evento.dataFim, "YYYY-MM-DD");
+      const dataInicio = moment(evento.dataInicio);
+      const dataFim = moment(evento.dataFim);
       const hoje = moment();
 
       if (
-        (dataInicio.isSame(hoje, "day") || dataInicio.isAfter(hoje)) &&
-        dataInicio.isBefore(dataFim, "day")
+        // Data de início e data de fim devem ser informadas
+        evento.dataInicio &&
+        evento.dataFim &&
+        // Data de início é superior a data atual
+        dataInicio.isAfter(hoje) &&
+        // Data fim é após a data de início
+        dataFim.isAfter(dataInicio)
       ) {
         datasSaoValidas = true;
       }
     }
-
     return datasSaoValidas;
   }
 
-  // async adicionar(usuario) {
-  //   const nomeEhValido =
-  //     usuario.nome.length > 0 &&
-  //     (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
+  async adicionar(evento) {
+    const nomeEhValido = evento.nome.length >= 5;
+    const descricaoEhValido = evento.descricao.length >= 5;
+    const urlFotoEhValida = isURLValida(evento.urlFoto);
+    const datasSaoValidas = this.isDatasValidas(evento);
 
-  //   const urlEhValida = await this.validarURLFotoPerfil(usuario.urlFotoPerfil);
+    const validacoes = [
+      {
+        nome: "nome",
+        valido: nomeEhValido,
+        mensagem: "Nome deve ser informado e ter mais de 5 caracteres",
+      },
+      {
+        nome: "descricao",
+        valido: descricaoEhValido,
+        mensagem: "Descrição deve ser informada e ter mais de 5 caracteres",
+      },
+      {
+        nome: "urlFoto",
+        valido: urlFotoEhValida,
+        mensagem: "URL da foto do evento deve ser uma URL válida",
+      },
+      {
+        nome: "datas",
+        valido: datasSaoValidas,
+        mensagem:
+          "Datas devem ser informadas no formato YYYY-mm-dd, data de inicio deve ser superior a data atuao, data de fim deve ser superior a data de início",
+      },
+    ];
 
-  //   const validacoes = [
-  //     {
-  //       nome: "nome",
-  //       valido: nomeEhValido,
-  //       mensagem: "Nome deve ser informado e deve ser único",
-  //     },
-  //     {
-  //       nome: "urlFotoPerfil",
-  //       valido: urlEhValida,
-  //       mensagem: "URL deve uma URL válida",
-  //     },
-  //   ];
+    const erros = validacoes.filter((campo) => !campo.valido);
+    const existemErros = erros.length > 0;
 
-  //   const erros = validacoes.filter((campo) => !campo.valido);
-  //   const existemErros = erros.length > 0;
+    if (existemErros) {
+      throw erros;
+    } else {
+      const resp = await repositorio.adicionar(evento);
+      return { id: resp.insertId, ...evento };
+    }
+  }
 
-  //   if (existemErros) {
-  //     throw erros;
-  //   } else {
-  //     await repositorio.adicionar(usuario);
-  //     return usuario;
-  //   }
-  // }
+  alterar(id, valores) {
+    return repositorio.alterar(id, valores);
+  }
 
-  // alterar(id, valores) {
-  //   return repositorio.alterar(id, valores);
-  // }
+  excluir(id) {
+    return repositorio.excluir(id);
+  }
 
-  // excluir(id) {
-  //   return repositorio.excluir(id);
-  // }
-
-  // buscarPorNome(nome) {
-  //   return repositorio.buscarPorNome(nome);
-  // }
-
-  // async validarURLFotoPerfil(url) {
-  //   try {
-  //     const regex =
-  //       /https?:\/\/(www.)?[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*)/gm;
-  //     const verificaUrl = url.match(regex);
-  //     if (!verificaUrl) {
-  //       return false;
-  //     }
-  //     const response = await fetch(url);
-  //     if (response.status !== 200) {
-  //       return false;
-  //     } else {
-  //       return true;
-  //     }
-  //   } catch {
-  //     return false;
-  //   }
-  // }
-
-  // async validarNomeUsuarioNaoUtilizado(nome) {
-  //   return new Promise((resolve) => {
-  //     const sql = "SELECT * FROM Usuarios WHERE nome = ?";
-  //     pool.query(sql, nome, (erro, resultados) => {
-  //       if (erro) {
-  //         resolve(false);
-  //       } else {
-  //         if (resultados.length > 0) {
-  //           resolve(false);
-  //         } else {
-  //           resolve(true);
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
+  listarPorStatus(status) {
+    switch (status) {
+      case "agendado":
+        return repositorio.listarEventosAgendados();
+      case "em-andamento":
+        return repositorio.listarEventosEmAndamento();
+      case "finalizado":
+        return repositorio.listarEventosFinalizados();
+      default:
+        throw new Error(`Status inválido: ${status}`);
+    }
+  }
 }
 
 module.exports = new Eventos();

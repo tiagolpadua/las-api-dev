@@ -7,23 +7,32 @@ module.exports = (app) => {
       .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.get("/tipos-vendas/:id", (req, res, next) => {
-    // TODO
+    const id = parseInt(req.params.id);
+    TiposVendas.buscarPorId(id)
+      .then((resultados) => res.json(resultados[0]))
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.post("/tipos-vendas", (req, res, next) => {
-    // TODO
+    const tipoVenda = req.body;
+    TiposVendas.adicionar(tipoVenda)
+      .then((resultado) => res.json(resultado))
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.put("/tipos-vendas/:id", (req, res, next) => {
-    // TODO
+    const id = parseInt(req.params.id);
+    const valores = req.body;
+    TiposVendas.alterar(id, valores)
+      .then(() => res.json(valores))
+      .catch((erros) => next(erros));
   });
 
-  // eslint-disable-next-line no-unused-vars
   app.delete("/tipos-vendas/:id", (req, res, next) => {
-    // TODO
+    const id = parseInt(req.params.id);
+    TiposVendas.excluir(id)
+      .then(() => res.status(204).send())
+      .catch((erros) => next(erros));
   });
 };

@@ -1,5 +1,3 @@
-// const pool = require("../infraestrutura/database/conexao");
-// const fetch = require("node-fetch");
 const repositorio = require("../repositorios/tipoVenda");
 
 class TiposVendas {
@@ -7,88 +5,22 @@ class TiposVendas {
     return repositorio.listar();
   }
 
-  // buscarPorId(id) {
-  //   return repositorio.buscarPorId(id);
-  // }
+  buscarPorId(id) {
+    return repositorio.buscarPorId(id);
+  }
 
-  // async adicionar(usuario) {
-  //   const nomeEhValido =
-  //     usuario.nome.length > 0 &&
-  //     (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
+  async adicionar(tipoVenda) {
+    const resp = await repositorio.adicionar(tipoVenda);
+    return { id: resp.insertId, ...tipoVenda };
+  }
 
-  //   const urlEhValida = await this.validarURLFotoPerfil(usuario.urlFotoPerfil);
+  alterar(id, valores) {
+    return repositorio.alterar(id, valores);
+  }
 
-  //   const validacoes = [
-  //     {
-  //       nome: "nome",
-  //       valido: nomeEhValido,
-  //       mensagem: "Nome deve ser informado e deve ser único",
-  //     },
-  //     {
-  //       nome: "urlFotoPerfil",
-  //       valido: urlEhValida,
-  //       mensagem: "URL deve uma URL válida",
-  //     },
-  //   ];
-
-  //   const erros = validacoes.filter((campo) => !campo.valido);
-  //   const existemErros = erros.length > 0;
-
-  //   if (existemErros) {
-  //     throw erros;
-  //   } else {
-  //     await repositorio.adicionar(usuario);
-  //     return usuario;
-  //   }
-  // }
-
-  // alterar(id, valores) {
-  //   return repositorio.alterar(id, valores);
-  // }
-
-  // excluir(id) {
-  //   return repositorio.excluir(id);
-  // }
-
-  // buscarPorNome(nome) {
-  //   return repositorio.buscarPorNome(nome);
-  // }
-
-  // async validarURLFotoPerfil(url) {
-  //   try {
-  //     const regex =
-  //       /https?:\/\/(www.)?[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*)/gm;
-  //     const verificaUrl = url.match(regex);
-  //     if (!verificaUrl) {
-  //       return false;
-  //     }
-  //     const response = await fetch(url);
-  //     if (response.status !== 200) {
-  //       return false;
-  //     } else {
-  //       return true;
-  //     }
-  //   } catch {
-  //     return false;
-  //   }
-  // }
-
-  // async validarNomeUsuarioNaoUtilizado(nome) {
-  //   return new Promise((resolve) => {
-  //     const sql = "SELECT * FROM Usuarios WHERE nome = ?";
-  //     pool.query(sql, nome, (erro, resultados) => {
-  //       if (erro) {
-  //         resolve(false);
-  //       } else {
-  //         if (resultados.length > 0) {
-  //           resolve(false);
-  //         } else {
-  //           resolve(true);
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
+  excluir(id) {
+    return repositorio.excluir(id);
+  }
 }
 
 module.exports = new TiposVendas();

@@ -11,25 +11,36 @@ class Evento {
     return query(sql, id);
   }
 
-  // adicionar(usuario) {
-  //   const sql = "INSERT INTO Usuarios SET ?";
-  //   return query(sql, usuario);
-  // }
+  adicionar(evento) {
+    const sql = "INSERT INTO Eventos SET ?";
+    return query(sql, evento);
+  }
 
-  // alterar(id, valores) {
-  //   const sql = "UPDATE Usuarios SET ? WHERE id = ?";
-  //   return query(sql, [valores, id]);
-  // }
+  alterar(id, valores) {
+    const sql = "UPDATE Eventos SET ? WHERE id = ?";
+    return query(sql, [valores, id]);
+  }
 
-  // excluir(id) {
-  //   const sql = "DELETE FROM Usuarios WHERE id = ?";
-  //   return query(sql, id);
-  // }
+  excluir(id) {
+    const sql = "DELETE FROM Eventos WHERE id = ?";
+    return query(sql, id);
+  }
 
-  // buscarPorNome(nome) {
-  //   const sql = "SELECT * FROM Usuarios WHERE nome like ?";
-  //   return query(sql, "%" + nome + "%");
-  // }
+  listarEventosAgendados() {
+    const sql = "SELECT * FROM Eventos WHERE dataInicio >= CURDATE();";
+    return query(sql);
+  }
+
+  listarEventosEmAndamento() {
+    const sql =
+      "SELECT * FROM Eventos WHERE dataInicio <= CURDATE() and dataFim >= CURDATE()";
+    return query(sql);
+  }
+
+  listarEventosFinalizados() {
+    const sql = "SELECT * FROM Eventos WHERE dataFim < CURDATE()";
+    return query(sql);
+  }
 }
 
 module.exports = new Evento();

@@ -1,5 +1,5 @@
 const pool = require("../infraestrutura/database/conexao");
-const fetch = require("node-fetch");
+const { isURLValida } = require("../infraestrutura/validacoes");
 const repositorio = require("../repositorios/usuario");
 
 class Usuarios {
@@ -16,7 +16,7 @@ class Usuarios {
       usuario.nome.length > 0 &&
       (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
 
-    const urlEhValida = await this.validarURLFotoPerfil(usuario.urlFotoPerfil);
+    const urlEhValida = await isURLValida(usuario.urlFotoPerfil);
 
     const validacoes = [
       {
@@ -37,8 +37,8 @@ class Usuarios {
     if (existemErros) {
       throw erros;
     } else {
-      await repositorio.adicionar(usuario);
-      return usuario;
+      const resp = await repositorio.adicionar(usuario);
+      return { id: resp.insertId, ...usuario };
     }
   }
 
@@ -52,25 +52,6 @@ class Usuarios {
 
   buscarPorNome(nome) {
     return repositorio.buscarPorNome(nome);
-  }
-
-  async validarURLFotoPerfil(url) {
-    try {
-      const regex =
-        /https?:\/\/(www.)?[-a-zA-Z0-9@:%.+~#=]{1,256}.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%+.~#?&//=]*)/gm;
-      const verificaUrl = url.match(regex);
-      if (!verificaUrl) {
-        return false;
-      }
-      const response = await fetch(url);
-      if (response.status !== 200) {
-        return false;
-      } else {
-        return true;
-      }
-    } catch {
-      return false;
-    }
   }
 
   async validarNomeUsuarioNaoUtilizado(nome) {

@@ -20,10 +20,10 @@ class Tabelas {
     });
   }
 
-  // insert into Eventos values (1, 'Carnapiri', 'carnaval de pirenópolis', 'https://randomuser.me/api/portraits/women/73.jpg', '2020-01-01 00:00:00', '2020-01-02 00:00:00');
+  // insert into Eventos values (1, 'Carnapiri', 'carnaval de pirenópolis', 'https://randomuser.me/api/portraits/women/73.jpg', '2022-05-01', '2022-05-15');
   criarEventos() {
     const sql =
-      "CREATE TABLE IF NOT EXISTS Eventos(id INT AUTO_INCREMENT NOT NULL, nome varchar(100) NOT NULL, descricao varchar(200) NOT NULL, urlFoto text, dataInicio datetime NOT NULL, dataFim datetime NOT NULL, PRIMARY KEY(id))";
+      "CREATE TABLE IF NOT EXISTS Eventos(id INT AUTO_INCREMENT NOT NULL, nome varchar(100) NOT NULL, descricao varchar(200) NOT NULL, urlFoto text, dataInicio date NOT NULL, dataFim date NOT NULL, PRIMARY KEY(id))";
 
     this.pool.query(sql, (erro) => {
       if (erro) {
