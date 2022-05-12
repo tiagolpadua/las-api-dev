@@ -10,7 +10,7 @@ module.exports = (app) => {
   app.get("/eventos/:id", (req, res, next) => {
     const id = parseInt(req.params.id);
     Eventos.buscarPorId(id)
-      .then((resultados) => res.json(resultados[0]))
+      .then((resultado) => res.json(resultado))
       .catch((erros) => next(erros));
   });
 
