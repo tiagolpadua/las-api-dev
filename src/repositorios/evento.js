@@ -6,9 +6,10 @@ class Evento {
     return query(sql);
   }
 
-  buscarPorId(id) {
+  async buscarPorId(id) {
     const sql = "SELECT * FROM Eventos WHERE id = ?";
-    return query(sql, id);
+    const resposta = await query(sql, id);
+    return resposta[0];
   }
 
   adicionar(evento) {

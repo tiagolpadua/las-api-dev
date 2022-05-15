@@ -2,13 +2,18 @@ const repositorio = require("../repositorios/evento");
 const moment = require("moment");
 const { isURLValida } = require("../infraestrutura/validacoes");
 
+const STATUS_AGENDADO = "agendado";
+const STATUS_EM_ANDAMENTO = "em-andamento";
+const STATUS_FINALIZADO = "finalizado";
+
 class Eventos {
-  listar() {
-    return repositorio.listar();
+  async listar() {
+    return this.insereStatusNosEventos(await repositorio.listar());
   }
 
-  buscarPorId(id) {
-    return repositorio.buscarPorId(id);
+  async buscarPorId(id) {
+    const evento = await repositorio.buscarPorId(id);
+    return this.insereStatusNoEvento(evento);
   }
 
   isDatasValidas(evento) {
@@ -73,32 +78,61 @@ class Eventos {
     }
   }
 
-  alterar(id, valores) {
-    return repositorio.alterar(id, valores);
+  async alterar(id, valores) {
+    return this.insereStatusNoEvento(await repositorio.alterar(id, valores));
   }
 
   excluir(id) {
     return repositorio.excluir(id);
   }
 
-  listarPorStatus(status) {
+  async listarPorStatus(status) {
+    let eventos;
+
     switch (status) {
-      case "agendado":
-        return repositorio.listarEventosAgendados();
-      case "em-andamento":
-        return repositorio.listarEventosEmAndamento();
-      case "finalizado":
-        return this.insereStatusNosEventos(
-          repositorio.listarEventosFinalizados()
-        );
+      case STATUS_AGENDADO:
+        eventos = await repositorio.listarEventosAgendados();
+        break;
+      case STATUS_EM_ANDAMENTO:
+        eventos = await repositorio.listarEventosEmAndamento();
+        break;
+      case STATUS_FINALIZADO:
+        eventos = await repositorio.listarEventosFinalizados();
+        break;
       default:
         throw new Error(`Status inválido: ${status}`);
     }
+
+    return this.insereStatusNosEventos(eventos);
   }
 
-  // insereStatusNosEventos(eventos) {
-  //   // .....//
-  // }
+  insereStatusNosEventos(eventos) {
+    return eventos.map((evento) => this.insereStatusNoEvento(evento));
+  }
+
+  insereStatusNoEvento(evento) {
+    if (evento) {
+      evento = { ...evento, status: this.obterStatusEvento(evento) };
+    }
+
+    return evento;
+  }
+
+  obterStatusEvento(evento) {
+    const dataInicio = moment(evento.dataInicio);
+    const dataFim = moment(evento.dataFim);
+    const hoje = moment();
+
+    if (dataInicio.isAfter(hoje)) {
+      return STATUS_AGENDADO;
+    } else if (dataInicio.isSameOrBefore(hoje) && dataFim.isSameOrAfter(hoje)) {
+      return STATUS_EM_ANDAMENTO;
+    } else if (dataFim.isBefore(hoje)) {
+      return STATUS_FINALIZADO;
+    }
+
+    return undefined;
+  }
 }
 
 module.exports = new Eventos();
