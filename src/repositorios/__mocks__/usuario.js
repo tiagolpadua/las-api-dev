@@ -7,10 +7,9 @@ class Usuario {
     return Promise.resolve(usuariosMock);
   }
 
-  // buscarPorId(id) {
-  //   const sql = "SELECT id, nome, urlFotoPerfil FROM Usuarios WHERE id = ?";
-  //   return query(sql, id);
-  // }
+  buscarPorId(id) {
+    return Promise.resolve(usuariosMock.find((usuario) => usuario.id === id));
+  }
 
   // adicionar(usuario) {
   //   const sql = "INSERT INTO Usuarios SET ?";

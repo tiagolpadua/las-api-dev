@@ -8,7 +8,7 @@ class Usuario {
 
   buscarPorId(id) {
     const sql = "SELECT id, nome, urlFotoPerfil FROM Usuarios WHERE id = ?";
-    return query(sql, id);
+    return query(sql, id).then((data) => data[0]);
   }
 
   adicionar(usuario) {
