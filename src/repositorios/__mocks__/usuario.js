@@ -1,28 +1,18 @@
+const usuariosMock = require("./usuarios");
+
 class Usuario {
   listar() {
-    return Promise.resolve([
-      {
-        id: 1,
-        nome: "Tiago",
-        urlFotoPerfil: "https://randomuser.me/api/portraits/women/73.jpg",
-      },
-      {
-        id: 2,
-        nome: "Paulo",
-        urlFotoPerfil: "https://randomuser.me/api/portraits/women/74.jpg",
-      },
-    ]);
+    return Promise.resolve(usuariosMock);
   }
 
-  //   buscarPorId(id) {
-  //     const sql = "SELECT id, nome, urlFotoPerfil FROM Usuarios WHERE id = ?";
-  //     return query(sql, id);
-  //   }
+  buscarPorId(id) {
+    return Promise.resolve([usuariosMock.find((usuario) => usuario.id === id)]);
+  }
 
-  //   adicionar(usuario) {
-  //     const sql = "INSERT INTO Usuarios SET ?";
-  //     return query(sql, usuario);
-  //   }
+  // adicionar(usuario) {
+  //   const sql = "INSERT INTO Usuarios SET ?";
+  //   return query(sql, usuario);
+  // }
 
   //   alterar(id, valores) {
   //     const sql = "UPDATE Usuarios SET ? WHERE id = ?";

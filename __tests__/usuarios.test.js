@@ -21,4 +21,14 @@ describe("Usuários", () => {
       },
     ]);
   });
+
+  test("Buscar por id", async () => {
+    const resp = await request.get("/usuarios/1");
+    expect(resp.statusCode).toBe(200);
+    expect(resp.body).toEqual({
+      id: 1,
+      nome: "Tiago",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/73.jpg",
+    });
+  });
 });
