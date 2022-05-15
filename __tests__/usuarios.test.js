@@ -38,8 +38,21 @@ describe("API de Usuários", () => {
     });
   });
 
-  test("Buscar usuário por id existente", async () => {
+  test("Buscar usuário por id inexistente", async () => {
     const resp = await request.get("/usuarios/9999");
     expect(resp.statusCode).toBe(404);
+  });
+
+  test("Adicionar Usuário com Dados Válidos", async () => {
+    const resp = await request.post("/usuarios").send({
+      nome: "Marcos",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/55.jpg",
+    });
+    expect(resp.statusCode).toBe(201);
+    expect(resp.body).toEqual({
+      id: 99,
+      nome: "Marcos",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/55.jpg",
+    });
   });
 });

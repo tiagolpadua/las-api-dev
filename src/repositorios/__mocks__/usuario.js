@@ -11,10 +11,15 @@ class Usuario {
     return Promise.resolve(usuariosMock.find((usuario) => usuario.id === id));
   }
 
-  // adicionar(usuario) {
-  //   const sql = "INSERT INTO Usuarios SET ?";
-  //   return query(sql, usuario);
-  // }
+  adicionar(usuario) {
+    return Promise.resolve(usuario && { insertId: 99 });
+  }
+
+  isNomeUsuarioUtilizado(nome) {
+    return Promise.resolve(
+      !!usuariosMock.find((usuario) => usuario.nome === nome)
+    );
+  }
 
   // alterar(id, valores) {
   //   const sql = "UPDATE Usuarios SET ? WHERE id = ?";

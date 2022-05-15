@@ -1,4 +1,3 @@
-const pool = require("../infraestrutura/database/conexao");
 const { isURLValida } = require("../infraestrutura/validacoes");
 const repositorio = require("../repositorios/usuario");
 
@@ -12,9 +11,17 @@ class Usuarios {
   }
 
   async adicionar(usuario) {
-    const nomeEhValido =
-      usuario.nome.length > 0 &&
-      (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
+    let nomeEhValido = false;
+
+    if (usuario.nome.length > 0) {
+      const nomeJaUtilizado = await repositorio.isNomeUsuarioUtilizado(
+        usuario.nome
+      );
+
+      if (!nomeJaUtilizado) {
+        nomeEhValido = true;
+      }
+    }
 
     const urlEhValida = await isURLValida(usuario.urlFotoPerfil);
 
@@ -52,23 +59,6 @@ class Usuarios {
 
   buscarPorNome(nome) {
     return repositorio.buscarPorNome(nome);
-  }
-
-  async validarNomeUsuarioNaoUtilizado(nome) {
-    return new Promise((resolve) => {
-      const sql = "SELECT * FROM Usuarios WHERE nome = ?";
-      pool.query(sql, nome, (erro, resultados) => {
-        if (erro) {
-          resolve(false);
-        } else {
-          if (resultados.length > 0) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        }
-      });
-    });
   }
 }
 

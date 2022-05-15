@@ -69,6 +69,17 @@ class Usuario {
       "SELECT nomeCompleto, dataNascimento, rg, cpf FROM Usuarios WHERE id = ?";
     return query(sql, id);
   }
+
+  isNomeUsuarioUtilizado(nome) {
+    const sql = "SELECT * FROM Usuarios WHERE nome = ?";
+    return query(sql, nome).then((data) => {
+      if (data.length > 0) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
 }
 
 module.exports = new Usuario();
