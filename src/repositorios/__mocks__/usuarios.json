@@ -2,11 +2,19 @@
   {
     "id": 1,
     "nome": "Tiago",
-    "urlFotoPerfil": "https://randomuser.me/api/portraits/women/73.jpg"
+    "urlFotoPerfil": "https://randomuser.me/api/portraits/women/73.jpg",
+    "nomeCompleto": "Tiago Foo Bar",
+    "dataNascimento": "1970-11-16T03:00:00.000Z",
+    "rg": "123456 SSP DF",
+    "cpf": "11122233312"
   },
   {
     "id": 2,
     "nome": "Paulo",
-    "urlFotoPerfil": "https://randomuser.me/api/portraits/women/74.jpg"
+    "urlFotoPerfil": "https://randomuser.me/api/portraits/women/74.jpg",
+    "nomeCompleto": "Paulo Bar Foo",
+    "dataNascimento": "1980-12-01T03:00:00.000Z",
+    "rg": "65444455 SSP DF",
+    "cpf": "33344455588"
   }
 ]

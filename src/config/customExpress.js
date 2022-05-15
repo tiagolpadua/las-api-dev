@@ -14,19 +14,18 @@ module.exports = () => {
     res.send("Bem vindo ao LAS-API");
   });
 
-  consign({ ignore: ["test.js"] })
-    .include("src/controllers")
-    .into(app);
+  consign().include("src/controllers").into(app);
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, req, res, next) => {
     if (err) {
-      if (ENV === "production") {
-        res.status(500).send({ error: "Algo deu errado..." });
-      } else {
-        res.status(500).send({ error: err });
+      if (err.erroApp) {
+        res.status(400).send(err.erroApp);
+      } else if (ENV !== "production") {
+        res.status(500).send({ error: err.message });
       }
-      console.log(err);
+    } else {
+      res.status(500).send({ error: "Algo deu errado..." });
     }
   });
 

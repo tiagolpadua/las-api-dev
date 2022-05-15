@@ -1,0 +1,1 @@
+insert into Usuarios values (1, 'Tiago', 'https://randomuser.me/api/portraits/women/73.jpg');

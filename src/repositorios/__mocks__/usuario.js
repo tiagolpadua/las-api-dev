@@ -1,18 +1,50 @@
 const usuariosMock = require("./usuarios");
 
+function getDadosBasicosUsuario({ id, nome, urlFotoPerfil }) {
+  return { id, nome, urlFotoPerfil };
+}
+
+function getDadosPessoaisUsuario({ nomeCompleto, dataNascimento, rg, cpf }) {
+  return { nomeCompleto, dataNascimento, rg, cpf };
+}
+
 class Usuario {
   listar() {
-    return Promise.resolve(usuariosMock);
+    return Promise.resolve(usuariosMock.map(getDadosBasicosUsuario));
   }
 
   buscarPorId(id) {
-    return Promise.resolve([usuariosMock.find((usuario) => usuario.id === id)]);
+    const usuario = usuariosMock.find((usuario) => usuario.id === id);
+
+    if (usuario) {
+      return Promise.resolve(getDadosBasicosUsuario(usuario));
+    } else {
+      return Promise.resolve();
+    }
   }
 
-  // adicionar(usuario) {
-  //   const sql = "INSERT INTO Usuarios SET ?";
-  //   return query(sql, usuario);
-  // }
+  buscarDadosPessoaisPorId(id) {
+    const usuario = usuariosMock.find((usuario) => usuario.id === id);
+
+    if (usuario) {
+      return Promise.resolve(getDadosPessoaisUsuario(usuario));
+    } else {
+      return Promise.resolve();
+    }
+  }
+
+  adicionar(usuario) {
+    return Promise.resolve(usuario && { insertId: 99 });
+  }
+
+  buscarPorNomeExato(nome) {
+    const usuario = usuariosMock.find((usuario) => usuario.nome === nome);
+    if (usuario) {
+      return Promise.resolve(getDadosBasicosUsuario(usuario));
+    } else {
+      return Promise.resolve();
+    }
+  }
 
   //   alterar(id, valores) {
   //     const sql = "UPDATE Usuarios SET ? WHERE id = ?";

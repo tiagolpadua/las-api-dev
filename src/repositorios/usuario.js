@@ -8,7 +8,13 @@ class Usuario {
 
   buscarPorId(id) {
     const sql = "SELECT id, nome, urlFotoPerfil FROM Usuarios WHERE id = ?";
-    return query(sql, id);
+    return query(sql, id).then((response) => response[0]);
+  }
+
+  buscarDadosPessoaisPorId(id) {
+    const sql =
+      "SELECT nomeCompleto, dataNascimento, rg, cpf FROM Usuarios WHERE id = ?";
+    return query(sql, id).then((response) => response[0]);
   }
 
   adicionar(usuario) {
@@ -30,6 +36,11 @@ class Usuario {
     const sql =
       "SELECT id, nome, urlFotoPerfil FROM Usuarios WHERE nome like ?";
     return query(sql, "%" + nome + "%");
+  }
+
+  buscarPorNomeExato(nome) {
+    const sql = "SELECT * FROM Usuarios WHERE nome = ?";
+    return query(sql, nome).then((response) => response[0]);
   }
 
   atualizarDadosPessoais(id, dadosPessoais) {

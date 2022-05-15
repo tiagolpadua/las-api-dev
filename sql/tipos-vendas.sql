@@ -1,0 +1,1 @@
+insert into TiposVendas values (1, 'Alimentação');

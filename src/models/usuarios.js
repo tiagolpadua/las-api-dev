@@ -1,4 +1,3 @@
-const pool = require("../infraestrutura/database/conexao");
 const { isURLValida } = require("../infraestrutura/validacoes");
 const repositorio = require("../repositorios/usuario");
 
@@ -11,12 +10,29 @@ class Usuarios {
     return repositorio.buscarPorId(id);
   }
 
-  async adicionar(usuario) {
-    const nomeEhValido =
-      usuario.nome.length > 0 &&
-      (await this.validarNomeUsuarioNaoUtilizado(usuario.nome));
+  buscarDadosPessoaisPorId(id) {
+    return repositorio.buscarDadosPessoaisPorId(id);
+  }
 
-    const urlEhValida = await isURLValida(usuario.urlFotoPerfil);
+  alterarDadosPessoais(id, { nomeCompleto, dataNascimento, rg, cpf }) {
+    const dadosPessoais = { nomeCompleto, dataNascimento, rg, cpf };
+    // demais validações
+    return repositorio.alterar(id, dadosPessoais);
+  }
+
+  async adicionar({ nome, urlFotoPerfil }) {
+    const usuario = { nome, urlFotoPerfil };
+
+    let nomeEhValido = false;
+
+    if (usuario?.nome?.length > 0) {
+      const jaUtilizado = await this.isNomeUsuarioUtilizado(usuario.nome);
+      if (!jaUtilizado) {
+        nomeEhValido = true;
+      }
+    }
+
+    const urlEhValida = await isURLValida(usuario?.urlFotoPerfil);
 
     const validacoes = [
       {
@@ -35,15 +51,16 @@ class Usuarios {
     const existemErros = erros.length > 0;
 
     if (existemErros) {
-      throw erros;
+      throw { erroApp: erros };
     } else {
       const resp = await repositorio.adicionar(usuario);
       return { id: resp.insertId, ...usuario };
     }
   }
 
-  alterar(id, valores) {
-    return repositorio.alterar(id, valores);
+  alterar(id, { nome, urlFotoPerfil }) {
+    const dadosBasicos = { nome, urlFotoPerfil };
+    return repositorio.alterar(id, dadosBasicos);
   }
 
   excluir(id) {
@@ -54,21 +71,8 @@ class Usuarios {
     return repositorio.buscarPorNome(nome);
   }
 
-  async validarNomeUsuarioNaoUtilizado(nome) {
-    return new Promise((resolve) => {
-      const sql = "SELECT * FROM Usuarios WHERE nome = ?";
-      pool.query(sql, nome, (erro, resultados) => {
-        if (erro) {
-          resolve(false);
-        } else {
-          if (resultados.length > 0) {
-            resolve(false);
-          } else {
-            resolve(true);
-          }
-        }
-      });
-    });
+  async isNomeUsuarioUtilizado(nome) {
+    return repositorio.buscarPorNomeExato(nome).then((usuario) => !!usuario);
   }
 }
 
