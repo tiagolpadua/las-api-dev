@@ -14,15 +14,13 @@ class Eventos {
   isDatasValidas(evento) {
     let datasSaoValidas = false;
 
+    // Data de início e data de fim devem ser informadas
     if (evento.dataInicio && evento.dataFim) {
       const dataInicio = moment(evento.dataInicio);
       const dataFim = moment(evento.dataFim);
       const hoje = moment();
 
       if (
-        // Data de início e data de fim devem ser informadas
-        evento.dataInicio &&
-        evento.dataFim &&
         // Data de início é superior a data atual
         dataInicio.isAfter(hoje) &&
         // Data fim é após a data de início
@@ -90,11 +88,17 @@ class Eventos {
       case "em-andamento":
         return repositorio.listarEventosEmAndamento();
       case "finalizado":
-        return repositorio.listarEventosFinalizados();
+        return this.insereStatusNosEventos(
+          repositorio.listarEventosFinalizados()
+        );
       default:
         throw new Error(`Status inválido: ${status}`);
     }
   }
+
+  // insereStatusNosEventos(eventos) {
+  //   // .....//
+  // }
 }
 
 module.exports = new Eventos();
