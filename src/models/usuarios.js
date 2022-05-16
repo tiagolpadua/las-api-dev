@@ -13,7 +13,7 @@ class Usuarios {
   async adicionar(usuario) {
     let nomeEhValido = false;
 
-    if (usuario.nome.length > 0) {
+    if (usuario?.nome?.length > 0) {
       const nomeJaUtilizado = await repositorio.isNomeUsuarioUtilizado(
         usuario.nome
       );
@@ -23,7 +23,7 @@ class Usuarios {
       }
     }
 
-    const urlEhValida = await isURLValida(usuario.urlFotoPerfil);
+    const urlEhValida = await isURLValida(usuario?.urlFotoPerfil);
 
     const validacoes = [
       {
@@ -42,7 +42,7 @@ class Usuarios {
     const existemErros = erros.length > 0;
 
     if (existemErros) {
-      throw erros;
+      throw { erroApp: erros };
     } else {
       const resp = await repositorio.adicionar(usuario);
       return { id: resp.insertId, ...usuario };

@@ -46,13 +46,54 @@ describe("API de Usuários", () => {
   test("Adicionar Usuário com Dados Válidos", async () => {
     const resp = await request.post("/usuarios").send({
       nome: "Marcos",
-      urlFotoPerfil: "https://randomuser.me/api/portraits/women/55.jpg",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/77.jpg",
     });
     expect(resp.statusCode).toBe(201);
     expect(resp.body).toEqual({
       id: 99,
       nome: "Marcos",
-      urlFotoPerfil: "https://randomuser.me/api/portraits/women/55.jpg",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/77.jpg",
     });
+  });
+
+  test("Adicionar Usuário com Dados Inválidos", async () => {
+    const respJaUtilizado = await request.post("/usuarios").send({
+      nome: "Tiago",
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/77.jpg",
+    });
+    expect(respJaUtilizado.statusCode).toBe(400);
+    expect(respJaUtilizado.body).toEqual([
+      {
+        mensagem: "Nome deve ser informado e deve ser único",
+        nome: "nome",
+        valido: false,
+      },
+    ]);
+
+    const respNomeInvalido = await request.post("/usuarios").send({
+      urlFotoPerfil: "https://randomuser.me/api/portraits/women/77.jpg",
+    });
+    expect(respNomeInvalido.statusCode).toBe(400);
+    expect(respNomeInvalido.body).toEqual([
+      {
+        mensagem: "Nome deve ser informado e deve ser único",
+        nome: "nome",
+        valido: false,
+      },
+    ]);
+
+    const respURLInvalida = await request.post("/usuarios").send({
+      nome: "Marcos",
+      urlFotoPerfil: "xxxxxxxxxxxxxxxxxx",
+    });
+
+    expect(respURLInvalida.statusCode).toBe(400);
+    expect(respURLInvalida.body).toEqual([
+      {
+        mensagem: "URL deve uma URL válida",
+        nome: "urlFotoPerfil",
+        valido: false,
+      },
+    ]);
   });
 });
