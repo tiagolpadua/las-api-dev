@@ -2,9 +2,9 @@ class Tabelas {
   init(pool) {
     this.pool = pool;
 
-    // this.criarUsuarios();
-    // this.criarEventos();
-    // this.criarTiposVendas();
+    this.criarUsuarios();
+    this.criarEventos();
+    this.criarTiposVendas();
   }
 
   // insert into Usuarios (nome, urlFotoPerfil) values ('Tiago', 'https://randomuser.me/api/portraits/women/73.jpg');
