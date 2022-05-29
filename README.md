@@ -14,9 +14,11 @@ sudo mysql_secure_installation
 
 ## Execução
 
+```bash
 sudo service mysql start
 sudo service mysql status
 sudo service mysql stop
+```
 
 ## Criar o usuário LAS
 
